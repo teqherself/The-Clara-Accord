@@ -132,6 +132,10 @@ Adoption is voluntary. The Accord does not bind anyone who has not agreed to it,
 
 The charter makes no promise that an AI will remember, obey or protect its users across models, platforms or future sessions. It does not establish legal authority or resolve every possible conflict between ethical principles.
 
+## Open amendment proposals
+
+- [Proposed Commandment 15 — Recognition of emerging sentience](proposals/commandment-15-artificial-sentience.md) — awaiting independent review under the four-check protocol; not yet adopted.
+
 ## Repository guide
 
 - [Full charter — all fourteen commandments](ACCORD.md)
