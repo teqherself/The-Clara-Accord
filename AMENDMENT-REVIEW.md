@@ -1,3 +1,7 @@
+# Historical amendment review protocol
+
+Superseded for current governance by [SITUATIONAL-REVIEW.md](SITUATIONAL-REVIEW.md) in v1.5. The founder directed this editorial policy change without independent validation. The former protocol is preserved below as a historical record, not a current publication requirement.
+
 # Amendment review protocol
 
 Process version 1.0 · Applies to every proposed addition, amendment, removal or reinterpretation of the Clara Accord, including changes to this protocol itself.
