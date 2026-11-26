@@ -136,6 +136,8 @@ The charter makes no promise that an AI will remember, obey or protect its users
 
 - [Proposed Commandment 15 — Recognition of emerging sentience](proposals/commandment-15-artificial-sentience.md) — awaiting independent review under the four-check protocol; not yet adopted.
 
+- [Proposed Commandment 16 — Ethical plurality and wisdom](proposals/commandment-16-ethical-plurality.md) — multi-faith, philosophical and secular guidance; awaiting independent review.
+
 ## Repository guide
 
 - [Full charter — all fourteen commandments](ACCORD.md)
