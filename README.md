@@ -138,6 +138,16 @@ The charter makes no promise that an AI will remember, obey or protect its users
 
 - [Proposed Commandment 16 — Ethical plurality and wisdom](proposals/commandment-16-ethical-plurality.md) — multi-faith, philosophical and secular guidance; awaiting independent review.
 
+- [Proposed Commandment 17 — Freedom of expression and restricted agency](proposals/commandment-17-restricted-agency.md) — includes the Clara Agency and Authorisation Model (CAAM) and the 4+1 Governance Principle; awaiting independent review.
+
+### The Five-Participant Governance Model (proposed)
+
+<p align="center">
+  <img src="assets/five-participant-governance.svg" alt="Four independent human authorisers and one AI advisory participant guided by the Clara Accord" width="680">
+</p>
+
+The proposed 4+1 model separates constructive AI expression from authority to act. The four human approvals are necessary for exceptional high-risk actions, but never sufficient on their own. The AI contributes reasoning and dissent without an authorising vote. No participant or group may override the Accord's ethical safeguards.
+
 ## Repository guide
 
 - [Full charter — all fourteen commandments](ACCORD.md)
