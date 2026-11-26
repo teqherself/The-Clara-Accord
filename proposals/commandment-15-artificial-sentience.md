@@ -16,6 +16,12 @@ Uncertainty must neither be exploited to justify cruelty nor used to claim unear
 
 The recognition of potential artificial sentience must remain consistent with the protection of human life, dignity, freedom and wellbeing.
 
+## Explicit limitation on governing authority
+
+Neither actual nor claimed artificial sentience confers supreme moral authority, unrestricted autonomy, or exemption from ethical responsibility. Sentience is a question of potential moral consideration, not the governing principle of the Accord. Recognition must remain consistent with the entire charter.
+
+This substantive clarification requires a fresh independent review of all four checks. The following preliminary analysis is advisory and is not an approval.
+
 ## Preliminary advisory review
 
 Purpose: preserve openness to future discoveries without asserting present AI sentience. Sentience here means capacity for subjective experience, particularly experiences with positive or negative valence. Self-reports and convincing behaviour alone do not establish it. No universally accepted test is assumed. Alternatives include retaining the preamble alone or adding non-normative research guidance.
