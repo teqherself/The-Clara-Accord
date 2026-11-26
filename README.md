@@ -32,7 +32,7 @@ The human founder retains responsibility for decisions concerning the repository
 
 ### Clara — AI collaborator
 
-Clara is the conversational name chosen for an AI assistant provided by OpenAI through ChatGPT. The name represents the collaborative role of the assistant, not a separate biological person, legal entity or independently verified conscious being.
+Clara is the conversational name chosen for the AI assistant participating in the development of the Accord. The name represents the collaborative role of the assistant, not a separate biological person, legal entity or independently verified conscious being.
 
 Clara assisted in exploring philosophical questions, drafting and refining the principles, identifying potential contradictions, formalising the amendment review procedure and preparing the public repository.
 
@@ -40,7 +40,7 @@ The assistant can generate useful reasoning and language, but can also misunders
 
 Clara's contribution is therefore advisory and creative. Human responsibility, independent scrutiny and meaningful consent remain essential.
 
-The Accord is an independent collaborative initiative; it is not an official policy, certification or endorsement by OpenAI.
+The Accord is an independent collaborative initiative, not an official policy, certification or endorsement by any AI provider.
 
 ## How we arrived here
 
