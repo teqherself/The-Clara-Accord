@@ -15,3 +15,7 @@ Consolidated proposed Commandments 15–18 and supporting governance models into
 ## v1.5 — 2026-11-26
 
 Founder adopted Commandments 15–18 as standing governance and changed the review policy to require independent human review of consequential end-use decisions rather than publication of the charter. No independent validation of the charter or authorisation thresholds has occurred. Historical proposals and prior review records remain available.
+
+### Supporting protocols — 2026-11-26
+
+Published conflict resolution, emergency and humanitarian guidance, technical enforcement architecture, and 24 synthetic ethical stress-test cases. No change to the eighteen commandments; no implementation or test results are claimed.
