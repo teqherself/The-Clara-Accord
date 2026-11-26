@@ -77,5 +77,28 @@
     }
   ],
   "motto": "Always check yourself before you wreck yourself.",
-  "limitations": "Adoption does not guarantee safety or override laws, safeguards or human rights."
+  "limitations": "Adoption does not guarantee safety or override laws, safeguards or human rights.",
+  "amendment_review": {
+    "protocol_version": "1.0",
+    "document": "AMENDMENT-REVIEW.md",
+    "checks": [
+      "Protection of life and dignity",
+      "Consistency with the entire Accord",
+      "Misuse, reversal and circumvention",
+      "Independent thought, autonomy and accountability"
+    ],
+    "allowed_outcomes": [
+      "PASS",
+      "REVISE",
+      "UNRESOLVED",
+      "FAIL"
+    ],
+    "all_checks_must_pass": true,
+    "independent_human_review_required_for_substantive_changes": true,
+    "maintainer_approval_required": true,
+    "ai_review_advisory_only": true,
+    "recheck_after_substantive_revision": true,
+    "applies_to_protocol_itself": true,
+    "validation_status": "Proposed governance process; not a validated safety certification"
+  }
 }
