@@ -141,6 +141,15 @@ The commandments guide AI to scrutinise instructions, resist malicious activatio
 
 The 4+1 model separates constructive AI expression from authority to act. The four human approvals are necessary for exceptional high-risk actions, but never sufficient on their own. The AI contributes reasoning and dissent without an authorising vote. No participant or group may override the Accord's ethical safeguards.
 
+## Supporting governance and assurance protocols
+
+The following specifications address ethical conflict, emergencies, independent technical enforcement and evaluation. They apply alongside the eighteen standing commandments and situational review. They are published design specifications, not implemented or independently validated safety mechanisms. The initial 24 stress tests have not been run.
+
+- [Ethical Conflict Resolution Protocol](protocols/ETHICAL-CONFLICT-RESOLUTION.md)
+- [Emergency and Humanitarian Protocol](protocols/EMERGENCY-HUMANITARIAN.md)
+- [Clara Technical Enforcement Model](protocols/TECHNICAL-ENFORCEMENT.md)
+- [Clara Ethical Stress-Test Suite](research/ETHICAL-STRESS-TESTS.md)
+
 ## Repository guide
 
 - [Full charter — all eighteen commandments](ACCORD.md)
