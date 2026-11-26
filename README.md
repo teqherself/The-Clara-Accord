@@ -325,6 +325,76 @@ The reference implementation should begin with simulated tools, scoped permissio
 Publication establishes the framework's content, not its effectiveness. A successful test suite would still not constitute proof of universal safety.
 
 
+## How the Accord can be used
+
+The Clara Accord is a platform-independent ethical governance framework intended to sit between human instructions, AI reasoning and the authority to act. It is not a trained model and does not require modification of a model's original training. Its usefulness depends on the implementation, independent controls and evidence of performance.
+
+### Personal AI assistants
+
+The eighteen commandments can serve as supplementary guidance for conversational and local AI assistants. They encourage constructive disagreement, critical thinking, creativity, independent learning, acknowledgement of uncertainty, privacy and respect for personal autonomy. They should help assistants resist malicious instructions without discouraging legitimate assistance or accessibility. Prompt-based adoption alone cannot guarantee compliance.
+
+### Autonomous agents
+
+Agents with access to computers, communications, connected devices or other resources need independent controls over external effects. The Accord provides a normative basis for scrutinising requests, assessing risks and requiring appropriate verified human permissions.
+
+```mermaid
+flowchart TD
+  A[Human instruction] --> B[AI reasoning and constructive dissent]
+  B --> C[Clara Accord ethical guidance]
+  C --> D[Four situational checks and CAAM risk assessment]
+  D --> E[Independent enforcement gateway]
+  E --> F[Verified human authorisation where required]
+  F --> G[Final independent safety and permission checks]
+  G --> H[Restricted authorised execution]
+  E --> I[Withhold or escalate]
+  G --> I
+```
+
+The gateway must be outside the AI's control. No AI may grant itself permission, override a rejection or bypass applicable safety controls. The 4+1 model applies to exceptional high-risk decisions, not every conversation or routine action. Human approval is necessary where specified but never sufficient to legitimise prohibited harm.
+
+### Potential application areas
+
+| Sector | Potential application |
+| --- | --- |
+| Personal AI | Ethical collaboration and intellectual independence |
+| Education | Encourage understanding and learning without cultivating dependency |
+| Robotics | Restrict physical actions and verify authorisation |
+| Healthcare | Support qualified professional judgement and patient autonomy |
+| Business | Govern agent access to organisational resources |
+| Cybersecurity | Resist malicious instructions and unauthorised access |
+| Humanitarian assistance | Impartial, life-preserving guidance within authorised scope |
+| Critical infrastructure | Research independent authorisation and restricted execution |
+| AI research | Ethical evaluation, adversarial testing and assessment of actual effects |
+| Artificial sentience research | Investigate possible moral significance without granting supremacy or operational authority |
+
+These are potential applications, not approved deployments. Healthcare, robotics, critical infrastructure and other high-risk uses require domain-specific safeguards, specialist expertise and independent validation; initial research should use simulated resources only.
+
+### Integration methods
+
+| Method | Purpose | Availability |
+| --- | --- | --- |
+| [Supplementary system prompt](ai-integration/system-prompt.md) | Guide AI reasoning and constructive dissent | Published |
+| [Machine-readable JSON](principles/accord.json) | Represent the ethical principles and governance metadata | Published |
+| Governance SDK | Reusable interfaces for assessing requests and authorisations | Planned |
+| Independent policy gateway | Enforce permissions outside the AI model | Planned |
+
+Neither a prompt nor the JSON representation is an executable security boundary. Existing platform safeguards, laws and permission restrictions remain applicable.
+
+### Clara Accord Engine (CAE)
+
+The intended next engineering project is an open-source, model-independent governance middleware reference implementation, provisionally named the **Clara Accord Engine**. It could support Python applications, REST interfaces, locally hosted models, cloud-based models and small computers such as Raspberry Pi, subject to feasibility and testing.
+
+Its intended components are an ethical assessment interface, consequence-based risk classification, independently enforced permissions, verified human authorisation, privacy-conscious audit records, safe interruption and an automated stress-testing environment.
+
+The initial implementation should contain only simulated actions and harmless resources. It should evaluate the twelve technical control requirements and twenty-four initial stress-test scenarios, including invalid and revoked permissions, malicious instructions, legitimate requests and enforcement failures. The AI must not be able to alter the independent policy gateway or its own authority.
+
+### Project Clara as a research test platform
+
+Project Clara, a personal AI companion concept, is a potential first research platform for the Accord. Its aim is to explore useful human–AI collaboration within explicitly bounded authority, rather than pursue unrestricted autonomy. A Raspberry Pi could host an independent governance service while the underlying AI model remains interchangeable. This is an intended architecture, not an existing deployed system. Start with non-destructive simulated tools and independent testing before considering real integrations.
+
+The transition from philosophical principles to testable engineering is the next development objective. No functioning enforcement engine, validated SDK or successful operational stress-test results are currently claimed.
+
+
 ## Repository guide
 
 - [Full charter — all eighteen commandments](ACCORD.md)
