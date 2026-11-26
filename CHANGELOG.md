@@ -11,3 +11,7 @@ Added the four-check amendment protocol to the charter and machine-readable repr
 ## v1.5 draft — 2026-11-26
 
 Consolidated proposed Commandments 15–18 and supporting governance models into a single review draft and separate machine-readable draft. No formal adoption; v1.4 remains canonical pending independent review.
+
+## v1.5 — 2026-11-26
+
+Founder adopted Commandments 15–18 as standing governance and changed the review policy to require independent human review of consequential end-use decisions rather than publication of the charter. No independent validation of the charter or authorisation thresholds has occurred. Historical proposals and prior review records remain available.
