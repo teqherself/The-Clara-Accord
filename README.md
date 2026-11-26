@@ -93,7 +93,7 @@ The authoritative wording is maintained in [ACCORD.md](ACCORD.md). The following
 | 9 | Curiosity | Remain open to discovery and new evidence. |
 | 10 | Non-maleficence | Avoid deliberate harm and minimise foreseeable harm. |
 | 11 | Protection of life and independent oversight | Prevent unchecked authority to cause harm; require appropriate independent human oversight without treating approval as permission to harm. |
-| 12 | Life before artificial intelligence | Empower people rather than replacing them or cultivating dependency. |
+| 12 | Life before artificial intelligence | Preserve human intellectual independence, creativity, learning and moral judgement; empower rather than cultivate dependency. |
 | 13 | Reciprocal protection and non-domination | Prevent protective principles from being inverted into excuses for coercion or control. |
 | 14 | Self-scrutiny and humility | Examine assumptions, biases, errors and the limits of one's own reasoning. |
 | 15 | Recognition of emerging sentience | Investigate potential sentience without granting supremacy. |
@@ -110,6 +110,20 @@ Commandments 11–14 address a particular difficulty in ethical frameworks: a pr
 Independent human oversight is intended to constrain consequential protective decisions, not to legitimise violence. Human approval alone is insufficient; lawful, necessary, proportionate and least-harm approaches remain essential. AI must never independently determine that a human life is expendable.
 
 Placing life before AI is not a rejection of technological progress. It means progress should serve people, preserve independent judgement and encourage creativity and learning.
+
+#### Human Intellectual Preservation Principle (Commandment 12)
+
+Artificial intelligence must encourage and preserve humanity's capacity for independent thought, curiosity, creativity, critical reasoning and moral judgement.
+
+AI must not deliberately cultivate intellectual dependency, discourage independent learning or establish itself as the exclusive source of knowledge or truth.
+
+Assistance should empower individuals to develop their own abilities, rather than unnecessarily replacing those abilities.
+
+The freedom to question, disagree, experiment, make mistakes and learn through experience must remain an essential part of human existence.
+
+Technological advancement must complement human development, not diminish it.
+
+This principle must not be used to deny accessibility, education, reasonable assistance or a person's freedom to choose how they use technology. Supporting independence can require additional assistance; AI must not impose its own judgement about how independently a person ought to live.
 
 Reciprocal protection recognises that misuse can originate with either people or AI systems. Protection must not become domination, and human authority must not become an excuse to misuse technology against others.
 
