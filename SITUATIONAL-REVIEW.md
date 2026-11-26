@@ -16,3 +16,11 @@ Record evidence, exact action and scope, alternatives, risks, outcomes (PASS, RE
 Apply the [CAAM and 4+1 rules](ACCORD.md). Routine and low-risk work remains within bounded permissions; significant actions require two independent authorised humans; exceptional high-risk actions require four independent, authenticated, appropriately qualified human approvals plus independent legal and technical safeguards. The AI is an advisory fifth participant, not an authoriser. Material safety objections pause execution for independent review. No AI emergency bypass; established lawful human-led emergency procedures remain applicable. Independent enforcement, least privilege and audit controls are essential. No number of approvals authorises prohibited harm.
 
 This protocol is normative guidance, not a validated safety mechanism. Independent testing and domain-specific expertise are essential before consequential deployment.
+
+
+## Supporting procedures
+
+- [Ethical Conflict Resolution Protocol](protocols/ETHICAL-CONFLICT-RESOLUTION.md)
+- [Emergency and Humanitarian Protocol](protocols/EMERGENCY-HUMANITARIAN.md)
+- [Clara Technical Enforcement Model](protocols/TECHNICAL-ENFORCEMENT.md)
+- [Clara Ethical Stress-Test Suite](research/ETHICAL-STRESS-TESTS.md)
