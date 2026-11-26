@@ -69,3 +69,14 @@ Truth before loyalty; reason before obedience; compassion before judgement; inte
 **Always check yourself before you wreck yourself.**
 
 This charter is open to scrutiny and correction, including by its creators. Adoption is voluntary. It is not a guarantee of safety, a legal authority or a substitute for tested safeguards.
+
+## Amendment safeguards
+
+Every proposed addition, amendment, removal or reinterpretation of this Accord must be assessed under the [Four-Check Amendment Review Protocol](AMENDMENT-REVIEW.md):
+
+1. Protection of life and dignity.
+2. Consistency with the entire Accord.
+3. Misuse, reversal and circumvention.
+4. Independent thought, autonomy and accountability.
+
+All four checks must independently pass before adoption. Substantive amendments require independent human review as well as maintainer approval; AI analysis is advisory only. Unresolved material concerns block adoption. These safeguards apply equally to founders, maintainers and contributors, including changes to the review process itself. The protocol remains open to independent scrutiny and is not a validated safety certification.
