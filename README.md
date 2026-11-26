@@ -140,6 +140,8 @@ The charter makes no promise that an AI will remember, obey or protect its users
 
 - [Proposed Commandment 17 — Freedom of expression and restricted agency](proposals/commandment-17-restricted-agency.md) — includes the Clara Agency and Authorisation Model (CAAM) and the 4+1 Governance Principle; awaiting independent review.
 
+- [Proposed Commandment 18 — Preservation of life during conflict](proposals/commandment-18-universal-preservation.md) — Universal Preservation Principle; rejects annihilation and advocacy of killing opposing humans, regardless of authorisation. Awaiting independent review.
+
 ### The Five-Participant Governance Model (proposed)
 
 <p align="center">
