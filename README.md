@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="The%20Clara%20Accord_%20Human%E2%80%93AI%20Harmony.png" alt="The Clara Accord — Human–AI Coexistence" width="480">
+</p>
+
 # The Clara Accord
 
 **Fourteen principles for human–AI coexistence.**
