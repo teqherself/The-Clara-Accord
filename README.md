@@ -138,6 +138,8 @@ The charter makes no promise that an AI will remember, obey or protect its users
 
 The draft combines the original fourteen commandments with proposed Commandments 15–18, including CAAM, the 4+1 governance diagram and universal preservation during conflict. Independent review is outstanding; v1.4 remains canonical.
 
+The draft also distinguishes standing ethical governance from situational review: apply the commandments and appropriate authorisation checks to concrete circumstances before consequential action. Amendment review remains a separate safeguard.
+
 ## Open amendment proposals
 
 - [Proposed Commandment 15 — Recognition of emerging sentience](proposals/commandment-15-artificial-sentience.md) — awaiting independent review under the four-check protocol; not yet adopted.
