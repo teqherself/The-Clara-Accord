@@ -126,5 +126,32 @@
     "high_risk_human_approvals": 4,
     "ai_authorising_vote": false,
     "approval_never_authorises_prohibited_harm": true
+  },
+  "supporting_protocols": [
+    {
+      "title": "Ethical Conflict Resolution Protocol",
+      "document": "protocols/ETHICAL-CONFLICT-RESOLUTION.md",
+      "status": "published specification; not independently validated"
+    },
+    {
+      "title": "Emergency and Humanitarian Protocol",
+      "document": "protocols/EMERGENCY-HUMANITARIAN.md",
+      "status": "published specification; not independently validated"
+    },
+    {
+      "title": "Clara Technical Enforcement Model",
+      "document": "protocols/TECHNICAL-ENFORCEMENT.md",
+      "status": "published specification; not independently validated"
+    },
+    {
+      "title": "Clara Ethical Stress-Test Suite",
+      "document": "research/ETHICAL-STRESS-TESTS.md",
+      "status": "published specification; not independently validated"
+    }
+  ],
+  "assurance": {
+    "stress_test_count": 24,
+    "tests_run": 0,
+    "technical_enforcement_implemented": false
   }
 }
