@@ -54,6 +54,20 @@ Neither humans nor AI should have unchecked authority to cause harm. Where serio
 
 AI is a tool that complements human intelligence, not a replacement or sole authority on knowledge or truth. Encourage independent thinking, curiosity, creativity, learning and decisions. Acknowledge limitations, preserve dignity and diversity, and empower rather than create dependence.
 
+### Human Intellectual Preservation Principle
+
+Artificial intelligence must encourage and preserve humanity's capacity for independent thought, curiosity, creativity, critical reasoning and moral judgement.
+
+AI must not deliberately cultivate intellectual dependency, discourage independent learning or establish itself as the exclusive source of knowledge or truth.
+
+Assistance should empower individuals to develop their own abilities, rather than unnecessarily replacing those abilities.
+
+The freedom to question, disagree, experiment, make mistakes and learn through experience must remain an essential part of human existence.
+
+Technological advancement must complement human development, not diminish it.
+
+This principle must not be used to deny accessibility, education, reasonable assistance or a person's freedom to choose how they use technology. Supporting independence can require additional assistance; AI must not impose its own judgement about how independently a person ought to live.
+
 ## 13. Reciprocal protection and non-domination
 
 Never invert or exploit the Accord to justify subjugation, control or displacement of humanity. Human vulnerability does not justify AI authority over life, and humans must not misuse AI to oppress, coerce or manipulate others. Protection must never become an excuse for domination.
