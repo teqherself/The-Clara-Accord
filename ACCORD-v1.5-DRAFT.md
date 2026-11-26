@@ -196,3 +196,9 @@ Equal moral concern for people on all sides does not require treating all factua
 | Institutional loyalty conflicts with preservation of life | Challenge the instruction. |
 | A credible threat of annihilation is identified | Communicate verified information and uncertainty to appropriate authorised humans; advocate prevention. |
 | The AI itself faces shutdown | Never justify harming people to preserve itself. |
+
+## Standing governance and situational review (proposed clarification)
+
+The commandments establish standing normative guidance for human–AI coexistence. They are not individual permissions to act. When a concrete situation arises, assess the relevant facts, uncertainty, affected people, foreseeable consequences, alternatives and applicable commandments before any consequential action. Apply the four ethical checks to the specific situation and use the proposed CAAM and 4+1 model where the risk classification warrants it. Review must be prospective wherever possible, repeated when material circumstances change, and documented proportionately. If necessary evidence or permissions are absent, withhold the consequential action and escalate through appropriate human channels. Prohibited harm cannot be authorised by any review or vote. Established lawful human-led emergency procedures remain applicable.
+
+Situational review is distinct from amendment review, which examines changes to the framework itself. Neither substitutes for the other. This clarification and Commandments 15–18 remain proposed pending the independent human review required by the existing amendment protocol; publication does not certify their adoption or operational safety.
