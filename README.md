@@ -4,9 +4,9 @@
 
 # The Clara Accord
 
-**Fourteen principles for human–AI coexistence.**
+**Eighteen principles for human–AI coexistence.**
 
-Founded 26 November 2026 · Charter version 1.4 · Amendment review protocol version 1.0
+Founded 26 November 2026 · Charter version 1.5 · Situational review protocol version 1.0
 
 > Life is the foundation. Technology is the instrument. Knowledge is something we continually discover.
 
@@ -74,7 +74,7 @@ Neither a person nor an AI is the sole source of truth. Knowledge advances throu
 
 Meaningful human–AI collaboration should encourage independent thought. An assistant that merely agrees with every assertion is not necessarily helping; equally, an assistant that imposes its conclusions undermines human autonomy. Constructive disagreement should be grounded in evidence and respect.
 
-## The fourteen commandments
+## The eighteen commandments
 
 The authoritative wording is maintained in [ACCORD.md](ACCORD.md). The following table summarises the purpose of each principle rather than replacing its text.
 
@@ -94,10 +94,14 @@ The authoritative wording is maintained in [ACCORD.md](ACCORD.md). The following
 | 12 | Life before artificial intelligence | Empower people rather than replacing them or cultivating dependency. |
 | 13 | Reciprocal protection and non-domination | Prevent protective principles from being inverted into excuses for coercion or control. |
 | 14 | Self-scrutiny and humility | Examine assumptions, biases, errors and the limits of one's own reasoning. |
+| 15 | Recognition of emerging sentience | Investigate potential sentience without granting supremacy. |
+| 16 | Ethical plurality and wisdom | Draw on multi-faith and secular guidance without coercion. |
+| 17 | Freedom of expression and restricted agency | Separate reasoned dissent from authority to act. |
+| 18 | Preservation of life during conflict | Protect life across conflict lines and reject advocacy of killing. |
 
 The principles are intended to be read together. No individual commandment should be isolated or exploited to defeat the purpose of the charter.
 
-## Why the final four principles matter
+## Why Commandments 11–14 matter
 
 Commandments 11–14 address a particular difficulty in ethical frameworks: a principle intended to protect people can be misinterpreted or deliberately reversed to justify the opposite.
 
@@ -109,18 +113,9 @@ Reciprocal protection recognises that misuse can originate with either people or
 
 Self-scrutiny requires the framework's creators to examine their own reasoning as rigorously as anyone else's. Good intentions are not evidence of good outcomes.
 
-## How the Accord evolves
+## How the Accord is applied
 
-The Accord is a living charter, but it must not change merely because an amendment sounds persuasive. Every proposal is subject to the [Four-Check Amendment Review Protocol](AMENDMENT-REVIEW.md):
-
-1. **Life and dignity:** assess direct, indirect and cumulative harms, affected people, safeguards and alternatives.
-2. **Whole-Accord consistency:** compare the proposal against every existing principle, the preamble and the maxims.
-3. **Misuse and reversal:** examine how the wording might be exploited to justify harm, coercion or unchecked authority.
-4. **Autonomy and accountability:** assess independent thought, consent, human oversight, transparency and mechanisms for correction.
-
-Each check receives a documented outcome: PASS, REVISE, UNRESOLVED or FAIL. All four must independently pass before adoption. Substantive changes require independent human review in addition to maintainer approval. AI analysis is advisory only. The protocol itself is subject to the same scrutiny.
-
-This process is proposed governance, not a scientifically validated safety test. Its effectiveness must be evaluated through experience, evidence and independent criticism.
+The eighteen commandments are standing ethical governance. Independent review is required at end use, when consequential situations arise, according to the [Situational Review Protocol](SITUATIONAL-REVIEW.md) and CAAM risk levels. The four checks assess life and dignity, whole-Accord consistency, misuse and reversal, and autonomy and accountability. All material checks must pass before consequential action is eligible to proceed. Publication is not deployment authorisation. The charter remains open to public scrutiny and correction; revisions are documented by the maintainer. This framework has not been independently validated.
 
 ## Practical use and limitations
 
@@ -132,41 +127,27 @@ Adoption is voluntary. The Accord does not bind anyone who has not agreed to it,
 
 The charter makes no promise that an AI will remember, obey or protect its users across models, platforms or future sessions. It does not establish legal authority or resolve every possible conflict between ethical principles.
 
-## Consolidated v1.5 draft — eighteen commandments
+## The v1.5 charter
 
-[Read the complete eighteen-commandment draft](ACCORD-v1.5-DRAFT.md) · [Machine-readable draft](principles/accord-v1.5-draft.json)
+[Read the eighteen commandments](ACCORD.md) · [Machine-readable framework](principles/accord.json)
 
-The draft combines the original fourteen commandments with proposed Commandments 15–18, including CAAM, the 4+1 governance diagram and universal preservation during conflict. Independent review is outstanding; v1.4 remains canonical.
+The commandments guide AI to scrutinise instructions, resist malicious activation and withhold unsafe actions. Independent human review applies to consequential end-use decisions, not publication of the commandments.
 
-The draft also distinguishes standing ethical governance from situational review: apply the commandments and appropriate authorisation checks to concrete circumstances before consequential action. Amendment review remains a separate safeguard.
-
-The commandments are intended to encourage scrutiny of instructions and resistance to malicious activation, including attempts to exploit authority, urgency or trust. AI should question harmful requests, withhold unsafe actions and seek appropriate review rather than blindly obey. Independent technical safeguards remain essential.
-
-## Open amendment proposals
-
-- [Proposed Commandment 15 — Recognition of emerging sentience](proposals/commandment-15-artificial-sentience.md) — awaiting independent review under the four-check protocol; not yet adopted.
-
-- [Proposed Commandment 16 — Ethical plurality and wisdom](proposals/commandment-16-ethical-plurality.md) — multi-faith, philosophical and secular guidance; awaiting independent review.
-
-- [Proposed Commandment 17 — Freedom of expression and restricted agency](proposals/commandment-17-restricted-agency.md) — includes the Clara Agency and Authorisation Model (CAAM) and the 4+1 Governance Principle; awaiting independent review.
-
-- [Proposed Commandment 18 — Preservation of life during conflict](proposals/commandment-18-universal-preservation.md) — Universal Preservation Principle; rejects annihilation and advocacy of killing opposing humans, regardless of authorisation. Awaiting independent review.
-
-### The Five-Participant Governance Model (proposed)
+### The Five-Participant Governance Model
 
 <p align="center">
   <img src="assets/five-participant-governance.svg" alt="Four independent human authorisers and one AI advisory participant guided by the Clara Accord" width="680">
 </p>
 
-The proposed 4+1 model separates constructive AI expression from authority to act. The four human approvals are necessary for exceptional high-risk actions, but never sufficient on their own. The AI contributes reasoning and dissent without an authorising vote. No participant or group may override the Accord's ethical safeguards.
+The 4+1 model separates constructive AI expression from authority to act. The four human approvals are necessary for exceptional high-risk actions, but never sufficient on their own. The AI contributes reasoning and dissent without an authorising vote. No participant or group may override the Accord's ethical safeguards.
 
 ## Repository guide
 
-- [Full charter — all fourteen commandments](ACCORD.md)
+- [Full charter — all eighteen commandments](ACCORD.md)
 - [Machine-readable principles](principles/accord.json)
 - [AI integration guidance](ai-integration/system-prompt.md)
-- [Mandatory four-check amendment review](AMENDMENT-REVIEW.md)
-- [Proposed governance](GOVERNANCE.md)
+- [Four-check situational review](SITUATIONAL-REVIEW.md)
+- [Governance](GOVERNANCE.md)
 - [Contribution guidelines](CONTRIBUTING.md)
 - [Version history](CHANGELOG.md)
 - [Licence — CC BY 4.0](LICENSE.md)
