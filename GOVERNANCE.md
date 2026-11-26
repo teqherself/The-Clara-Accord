@@ -1,11 +1,3 @@
-# Governance (proposed)
+# Governance
 
-The repository owner maintains the canonical text. Proposed changes are public and documented. Adoption remains voluntary; no AI or human acquires authority over others through this charter.
-
-## Mandatory amendment review
-
-Every proposed addition, amendment, removal or reinterpretation must follow the [Four-Check Amendment Review Protocol](AMENDMENT-REVIEW.md). All four checks must pass independently. Substantive changes require independent human review in addition to maintainer approval; seek qualified expertise for serious safety, rights or harm questions. AI review is advisory only. If independent review is unavailable, keep the change proposed.
-
-Record objections, evidence, rationale and version changes. Apply the same standards to founders, maintainers, contributors and AI systems, including amendments to governance and the review protocol itself.
-
-These governance arrangements are open to community scrutiny and correction.
+The repository owner maintains the canonical charter. All eighteen commandments are standing guidance. Independent human review applies to consequential end-use decisions under the [Situational Review Protocol](SITUATIONAL-REVIEW.md), CAAM and the 4+1 model. No authorisation permits prohibited harm. Editorial adoption is a maintainer decision; revisions must be transparent, open to criticism and recorded in the changelog. Independent critique and testing are encouraged. The framework is not independently validated or a deployment certification.
