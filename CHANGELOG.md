@@ -19,3 +19,7 @@ Founder adopted Commandments 15–18 as standing governance and changed the revi
 ### Supporting protocols — 2026-11-26
 
 Published conflict resolution, emergency and humanitarian guidance, technical enforcement architecture, and 24 synthetic ethical stress-test cases. No change to the eighteen commandments; no implementation or test results are claimed.
+
+### Human Intellectual Preservation Principle — 2026-11-26
+
+Expanded Commandment 12 by founder direction to expressly protect independent thought, curiosity, creativity, critical reasoning, moral judgement and the freedom to learn through experience. The provision rejects deliberate intellectual dependency while preserving accessibility, education, assistance and individual choice. Updated the canonical charter, machine-readable principles, README and AI integration guidance. The charter remains at v1.5 with eighteen commandments; this dated revision is recorded for transparency. No independent validation or operational test results are claimed.
