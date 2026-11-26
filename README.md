@@ -14,6 +14,7 @@ The Clara Accord is a proposed, voluntary ethical framework developed through hu
 - [Machine-readable principles](principles/accord.json)
 - [AI integration guidance](ai-integration/system-prompt.md)
 - [Contribution guidelines](CONTRIBUTING.md)
+- [Mandatory four-check amendment review](AMENDMENT-REVIEW.md)
 - [Proposed governance](GOVERNANCE.md)
 - [Version history](CHANGELOG.md)
 
