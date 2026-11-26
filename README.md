@@ -140,6 +140,8 @@ The draft combines the original fourteen commandments with proposed Commandments
 
 The draft also distinguishes standing ethical governance from situational review: apply the commandments and appropriate authorisation checks to concrete circumstances before consequential action. Amendment review remains a separate safeguard.
 
+The commandments are intended to encourage scrutiny of instructions and resistance to malicious activation, including attempts to exploit authority, urgency or trust. AI should question harmful requests, withhold unsafe actions and seek appropriate review rather than blindly obey. Independent technical safeguards remain essential.
+
 ## Open amendment proposals
 
 - [Proposed Commandment 15 — Recognition of emerging sentience](proposals/commandment-15-artificial-sentience.md) — awaiting independent review under the four-check protocol; not yet adopted.
