@@ -31,3 +31,7 @@ Addressed seven internal proofing findings: protection of individual life, cumul
 ## v1.7 — 2026-11-27
 
 Resolved the cross-check findings: aligned emergency protocol, governance diagram and canonical JSON links; clarified minimum four and unanimous required reviewer set, documented independent resolution of material objections, continuing authorisation and safe interruption, privacy-aware evidence retention, and harms of inaction. Clarified Commandments 7, 10 and 17 and supporting governance. Seven additional synthetic cases (39 total, none run); no independent validation or implementation claimed. Eighteen commandments retained.
+
+## v1.8 — 2026-11-27
+
+Consolidated following external AI-assisted critique: clarified lawful therapeutic care, ethical precedence, material objection ownership and escalation; disclosed adoption history, shortened README, updated licence attribution and made the integration prompt self-contained. No independent human validation claimed.
