@@ -12,3 +12,7 @@ Only four synthetic action types are recognised; the fixed table classifies priv
 Local evaluation on 2026-11-27: 13 pytest tests passed. This is an internal simulated component test, not certification, and not 13 of the full 39 ethical scenarios. See [evaluation mapping](../research/EVALUATION.md).
 
 Limitations: synthetic identities, no real authentication, independent process boundary, persistent storage, network API, role verification, risk evaluation of arbitrary inputs, safe interruption of long-running activity, objection closure, or privacy-compliant audit service. Admin methods are trusted test fixtures, not suitable for exposure to an AI. State and replay protection disappear on restart. Concurrency test covers threads within one process only. Never connect this prototype to real external actions or sensitive data. Code is MIT-licensed; charter documentation remains CC BY 4.0.
+
+## Newer prototype
+
+[Engine v0.2 — persistent SQLite sandbox](v02/README.md) adds durable single-use execution, synthetic token roles and objection lifecycle. Its separate local suite passed 15 checks. v0.1 remains a historical reference.
