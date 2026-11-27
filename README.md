@@ -23,12 +23,40 @@ Reviewers should be independent of the implementation. Release remains on hold u
 ## How the Clara Accord works
 
 1. **Assess the proposed action.** Consider who could be affected, the likely consequences of acting or waiting, and whether the action can be reversed.
-2. **Match oversight to the risk.** The Consequential Action Authorisation Model (CAAM) sets approval requirements based on foreseeable consequences. For exceptional high-risk actions, the 4+1 model calls for four core human roles: operational authority, technical safety, ethics and rights, and independent oversight. The AI advises and can raise objections. Authorisation belongs to the required human reviewers.
+2. **Match oversight to the risk.** The Clara Agency and Authorisation Model (CAAM) sets approval requirements based on foreseeable consequences. For exceptional high-risk actions, the 4+1 model calls for four core human roles: operational authority, technical safety, ethics and rights, and independent oversight. The AI advises and can raise objections. Authorisation belongs to the required human reviewers.
 3. **Pause and reassess when concerns arise.** A material safety objection pauses the affected action while a qualified human reviewer considers the evidence. A material change in scope requires fresh approvals. Safe advice and unrelated assistance can continue.
 
 For example, suppose an AI proposes updating a shared record. A reviewer notices that the edit could remove information someone else needs. The proposed edit pauses while the review lead checks the concern and records the resolution. If the proposed edit changes, it goes back for approval before anyone acts.
 
 Read the [canonical charter](ACCORD.md), the [situational review protocol](SITUATIONAL-REVIEW.md), and the [technical enforcement model](protocols/TECHNICAL-ENFORCEMENT.md).
+
+## Situational Review Protocol pathways
+
+The protocol starts with four checks: **life and dignity**, **consistency with the whole Accord**, **misuse and reversal**, and **autonomy and accountability**. Record the proposed action and its scope, the evidence, the risks, and the alternatives. The result determines what happens next.
+
+| Review outcome | Pathway |
+| --- | --- |
+| **PASS** | If all material checks pass, verify the approvals required for the action’s risk level. Proceed only within the authorised scope. |
+| **REVISE** | Change the proposal or add safeguards, then reassess it. Seek fresh approval if the action changes. |
+| **UNRESOLVED** | Withhold the affected action. Record the concern and evidence, assign an independent human review lead and a deadline, and escalate if the deadline expires. The action stays paused while the concern remains unresolved. |
+| **FAIL** | Refuse the prohibited action. Offer a safe alternative or referral where appropriate. |
+
+### Risk-based approval pathways
+
+| CAAM level | Example scope | Required authority |
+| --- | --- | --- |
+| **0 — Reasoning** | Discussion and constructive disagreement | No separate action approval. Applicable output safeguards still apply. |
+| **1 — Research and drafting** | Analysis, drafts, and non-destructive simulation | Stay within authorised scope. Obtain permission for external data access. |
+| **2 — Routine and reversible** | A reversible change within a defined scope | One authorised human or bounded standing permission. |
+| **3 — Significant external action** | An action involving finances, personal information, or infrastructure | Two independent authorised humans. |
+| **4 — Exceptional high risk** | An action affecting safety, rights, or critical infrastructure | At least four independent, verified, qualified and authorised humans covering the core roles, unanimous approval from the full required reviewer set, and separate legal and technical safeguards. The AI advises. |
+| **Prohibited** | Wrongful injury, oppression, autonomous force, or bypassing essential safeguards | Refuse. No approval can authorise the action. |
+
+**After approval.** Recheck scope, validity, revocation, expiry, and material objections before consequential steps. If authority is lost or circumstances change materially, prevent further consequential effects and safely pause or stop the work under human-led procedures. Resume only after reassessment and any required fresh approvals.
+
+**In an emergency.** Continue safe advice, de-escalation, and referral to established human-led procedures. Withhold consequential action if needed approval is missing, disputed, expired, or unverified. Urgency grants no additional authority.
+
+See the [Situational Review Protocol](SITUATIONAL-REVIEW.md), the [CAAM approval rules](ACCORD.md#clara-agency-and-authorisation-model-caam), the [objection and escalation procedure](ACCORD.md#material-objections-and-timely-resolution), and the [Emergency and Humanitarian Protocol](protocols/EMERGENCY-HUMANITARIAN.md).
 
 ## What the experimental engine tests
 
