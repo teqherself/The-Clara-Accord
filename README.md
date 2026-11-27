@@ -22,13 +22,14 @@ Reviewers should be independent of the implementation. Release remains on hold u
 
 ## How the Clara Accord works
 
-1. **Assess the proposed action.** Consider who could be affected, the likely consequences of acting or waiting, and whether the action can be reversed.
-2. **Match oversight to the risk.** The Clara Agency and Authorisation Model (CAAM) sets approval requirements based on foreseeable consequences. For exceptional high-risk actions, the 4+1 model calls for four core human roles: operational authority, technical safety, ethics and rights, and independent oversight. The AI advises and can raise objections. Authorisation belongs to the required human reviewers.
-3. **Pause and reassess when concerns arise.** A material safety objection pauses the affected action while a qualified human reviewer considers the evidence. A material change in scope requires fresh approvals. Safe advice and unrelated assistance can continue.
+Imagine someone asks an AI assistant to remove outdated entries from a shared incident log. Some entries may still be needed by another team. Here’s how the Accord would handle that request.
 
-For example, suppose an AI proposes updating a shared record. A reviewer notices that the edit could remove information someone else needs. The proposed edit pauses while the review lead checks the concern and records the resolution. If the proposed edit changes, it goes back for approval before anyone acts.
+1. **Draft the change.** The assistant can propose which entries to remove while leaving the log untouched. It records the proposed scope, who could be affected, what might be lost, and how the change could be reversed.
+2. **Identify who can authorise it.** The Clara Agency and Authorisation Model (CAAM) ties approval to foreseeable consequences. A routine reversible edit needs an authorised human or bounded standing permission. A change with significant external consequences needs two independent authorised humans. Exceptional high-risk actions follow the 4+1 pathway, with the AI advising and the full set of required qualified human reviewers deciding.
+3. **Pause when someone raises a material concern.** If a reviewer says another team still needs the entries, the proposed edit pauses. An independent human review lead records the concern and checks the evidence. If it remains unresolved at the deadline, the lead escalates it. Other safe work, such as drafting a summary, can continue.
+4. **Reassess the revised plan.** The team might propose marking the entries as outdated while keeping them available. That changes the action, so the revised proposal needs a new assessment and fresh approval. Before making the change, confirm that permission is still valid and the concern has been resolved.
 
-Read the [canonical charter](ACCORD.md), the [situational review protocol](SITUATIONAL-REVIEW.md), and the [technical enforcement model](protocols/TECHNICAL-ENFORCEMENT.md).
+The [protocol pathways below](#situational-review-protocol-pathways) show how a review leads to approval, revision, escalation or refusal. Read the [canonical charter](ACCORD.md) and [technical enforcement model](protocols/TECHNICAL-ENFORCEMENT.md) for the full rules.
 
 ## Situational Review Protocol pathways
 
