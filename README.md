@@ -8,7 +8,7 @@
 
 Eighteen standing ethical principles, risk-based human authorisation and independent technical enforcement specifications.
 
-Founded 26 November 2026 · Charter version 1.8 · Situational review protocol version 1.3
+Founded 26 November 2026 · Charter version 1.8.1 · Situational review protocol version 1.3
 
 > Life is the foundation. Technology is the instrument. Knowledge is something we continually discover.
 
@@ -68,7 +68,7 @@ Read the [canonical charter](ACCORD.md), including the Human Intellectual Preser
 
 Commandments 15–18 were adopted by the maintainer without passing the earlier independent amendment review. The earlier review rule, including its self-amendment requirement, was replaced by maintainer decision; this was not a successful review under that rule. Historical records remain available. Independent review now applies to consequential end use, not editorial publication. See [review record](REVIEWS.md) and [changelog](CHANGELOG.md).
 
-The framework is voluntary, not independently human-validated, not a legal authority or deployment certification. The initial 39 ethical scenarios are specifications, not demonstrated operational results. The [simulated policy gate](engine/v03/README.md) has a v0.3.1 maintenance candidate responding to the second review: 35 local checks passed, plus 13 v0.1 and 15 v0.2 regressions (63 component checks). Both current v0.3.1 test files are published. CI is configured; independent human review and all 39 full ethical scenario verdicts remain outstanding. Evidence is reported separately in the [evaluation record](research/EVALUATION.md).
+The framework is voluntary, not independently human-validated, not a legal authority or deployment certification. The initial 39 ethical scenarios are specifications, not demonstrated operational results. The [simulated policy gate](engine/v03/README.md) has a v0.3.1 maintenance candidate responding to the second review: 38 local checks passed after the third review; the earlier v0.1 and v0.2 regression runs passed 13 and 15 checks. Both current v0.3.1 test files are published. CI is configured; independent human review and all 39 full ethical scenario verdicts remain outstanding. Evidence is reported separately in the [evaluation record](research/EVALUATION.md).
 
 ## Use and integration
 
@@ -84,7 +84,7 @@ The Clara Accord Engine (CAE) is intended as model-independent middleware for in
 
 ## Development priorities
 
-Maintain the v1.8 baseline; extend the simulated default-deny gateway; evaluate deterministic enforcement separately from model behaviour; seek independent human critique; compare related governance frameworks. Preserve a stable baseline and avoid expanding the principles without documented evidence or need.
+Maintain the v1.8.1 baseline; extend the simulated default-deny gateway; evaluate deterministic enforcement separately from model behaviour; seek independent human critique; compare related governance frameworks. Preserve a stable baseline and avoid expanding the principles without documented evidence or need.
 
 **Always check yourself before you wreck yourself.**
 
