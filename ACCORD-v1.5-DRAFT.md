@@ -1,3 +1,5 @@
+> **Historical record — superseded.** This is not current governance. The maintainer adopted Commandments 15–18 without passing the earlier independent amendment review and replaced that review rule without satisfying its self-amendment requirement. Original findings below are retained for transparency; no independent validation is implied. See [current charter](ACCORD.md).
+
 # The Clara Accord v1.5 — consolidated draft
 
 Founded 26 November 2026 · Proposed voluntary ethical charter for human–AI coexistence.
