@@ -39,3 +39,7 @@ Consolidated following external AI-assisted critique: clarified lawful therapeut
 ### Engine prototype v0.1
 
 Published a simulated in-memory Python policy gate and 13 locally passing pytest checks. No live actions, real identity verification or full ethical scenario evaluations. Code under engine/ is MIT; charter documentation remains CC BY 4.0.
+
+### Engine prototype v0.2 — 2026-11-27
+
+Added SQLite persistence, transactional single use across processes, synthetic bearer-token roles, designated requester/review lead and objection deadline listing. Fifteen local pytest checks passed, including failure rollback and replay after restart. No live effects, independent deployment boundary or real human verification. Charter v1.8 unchanged.
