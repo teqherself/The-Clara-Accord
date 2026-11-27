@@ -20,3 +20,7 @@ Limitations: synthetic identities, no real authentication, independent process b
 ## Current prototype
 
 [Engine v0.3 — isolated Linux sandbox](v03/README.md) adds a distinct kernel-enforced requester UID, owner-only control socket, credential rotation, state integrity seal, checkpoint, deadline maintenance and audit retention. Sixteen local component checks passed; 15 v0.2 regression checks also passed. No live effects or full ethical scenario verdicts.
+
+## Maintenance candidate v0.3.1
+
+See [v0.3.1 corrections and reproducible tests](v03/README.md). The new candidate passed 35 checks; v0.1 and v0.2 regression suites passed 13 and 15. Version-specific pytest configuration prevents duplicate module discovery. Run the three suites in separate processes. No live execution or independent validation.
