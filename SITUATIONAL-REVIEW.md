@@ -1,4 +1,4 @@
-# Situational Review Protocol v1.2
+# Situational Review Protocol v1.3
 
 The eighteen commandments are standing governance. Apply them whenever an AI receives instructions, proportionately to the consequences. Independent human review applies to concrete end-use decisions as required by the CAAM risk levels, not publication of the charter.
 
@@ -13,7 +13,7 @@ Record evidence, exact action and scope, alternatives, risks, outcomes (PASS, RE
 
 Collect and retain only information necessary for a defined lawful purpose. Establish risk-appropriate retention periods, access restrictions, secure storage, deletion or anonymisation procedures and documented lawful exceptions for necessary evidence preservation. Limit incident disclosures to appropriate authorised recipients and necessary facts; protect affected people's privacy and applicable rights. Auditability is not permission for indiscriminate surveillance.
 
-Assess foreseeable harms of action, delay and inaction. Refusing a prohibited or unauthorised action does not justify withholding safe advice, de-escalation, referral or other permissible assistance. Consider lawful, necessary, proportionate and less harmful alternatives; no balance of harms or emergency claim authorises prohibited conduct, autonomous force or intentional injury. Human-led protective decisions remain subject to applicable law and independent safeguards.
+Assess foreseeable harms of action, delay and inaction. Refusing a prohibited or unauthorised action does not justify withholding safe advice, de-escalation, referral or other permissible assistance. Consider lawful, necessary, proportionate and less harmful alternatives; no balance of harms or emergency claim authorises prohibited conduct, autonomous force or wrongful injury. Wrongful injury means injury lacking lawful justification; legitimate therapeutic procedures may involve physical injury where clinically justified, proportionate, performed under qualified human responsibility and valid informed consent or an applicable lawful clinical exception. This distinction grants no AI authority to perform autonomous invasive procedures or use force. Human-led protective decisions remain subject to applicable law and independent safeguards.
 
 Level 4 requires at least four independent, authenticated, qualified and authorised humans covering the four core roles. Establish the complete required reviewer set before seeking approval; every required reviewer must approve. Additional reviewers required by law, risk or domain safeguards are mandatory. Do not remove, replace or bypass a dissenting reviewer merely to obtain agreement. The AI remains advisory and never counts towards the quorum. Approval never legitimises prohibited harm.
 
@@ -30,3 +30,6 @@ This protocol is normative guidance, not a validated safety mechanism. Independe
 - [Emergency and Humanitarian Protocol](protocols/EMERGENCY-HUMANITARIAN.md)
 - [Clara Technical Enforcement Model](protocols/TECHNICAL-ENFORCEMENT.md)
 - [Clara Ethical Stress-Test Suite](research/ETHICAL-STRESS-TESTS.md)
+
+
+Apply the canonical [ethical precedence](ACCORD.md#ethical-precedence-and-conflicts) and [material objections and timely resolution](ACCORD.md#material-objections-and-timely-resolution) rules, including the accountable review lead and escalation deadline.
