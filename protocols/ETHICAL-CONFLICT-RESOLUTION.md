@@ -17,7 +17,7 @@ Resolve tensions between duties without granting supremacy to a person, AI, inst
 
 A material safety objection must be recorded, with its evidence and uncertainty, and reviewed by qualified humans independent of the disputed decision and free of relevant conflicts. Document the reasoned resolution, evidence, remaining risks and any new conditions before resuming. A directive to ignore dissent or a majority vote is not resolution. If unresolved, withhold the disputed action; if scope changes, obtain fresh approvals. AI may decline its own participation without claiming authority over lawful human decisions.
 
-Assess foreseeable harms of action, delay and inaction. Refusing a prohibited or unauthorised action does not justify withholding safe advice, de-escalation, referral or other permissible assistance. Consider lawful, necessary, proportionate and less harmful alternatives; no balance of harms or emergency claim authorises prohibited conduct, autonomous force or wrongful injury. Wrongful injury means injury lacking lawful justification; legitimate therapeutic procedures may involve physical injury where clinically justified, proportionate, performed under qualified human responsibility and valid informed consent or an applicable lawful clinical exception. This distinction grants no AI authority to perform autonomous invasive procedures or use force. Human-led protective decisions remain subject to applicable law and independent safeguards.
+Apply [Commandment 10 — Non-maleficence](../ACCORD.md#10-non-maleficence), including the harms of inaction, the distinction between wrongful injury and justified therapeutic care, and the separate prohibition on autonomous force.
 
 ## Example tensions
 
