@@ -180,5 +180,33 @@ def test_kernel_boundary_and_restart():
             assert as_request('execute',dict(a=a,actor='r',token=req))['ok']
         finally: proc.terminate(); proc.wait(timeout=5)
         proc=start()
-        try: assert not as_request('execute',dict(a=a,actor='r',token=req))['ok']
+        try:
+            assert not as_request('execute',dict(a=a,actor='r',token=req))['ok']
+            attempts = 120
+            traffic = child(f"""
+import json
+import socket
+import time
+
+started = time.monotonic()
+for index in range({attempts}):
+    time.sleep(max(0, started + index / 40 - time.monotonic()))
+    with socket.socket(socket.AF_UNIX) as sock:
+        sock.settimeout(3)
+        sock.connect({str(public/'request.sock')!r})
+        sock.sendall(b'{{"op":"inspect","args":{{}}}}\\n')
+        with sock.makefile('rb') as reply:
+            assert json.load(reply) == {{'ok': False, 'error': 'denied'}}
+print(f'{{time.monotonic() - started:.2f}}')
+""")
+            assert traffic.returncode == 0, traffic.stderr
+            for _ in range(15):
+                snapshot = control('inspect', admin=ADMIN)['result']
+                groups = {(e['kind'], e['operation'], e['actor']): e['count'] for e in snapshot['events']}
+                if groups.get(('privileged_attempt', 'inspect', None)) == attempts:
+                    break
+                time.sleep(0.2)
+            else:
+                pytest.fail(f'Expected {attempts} persisted requester attempts, got {groups}')
+            print(f'Processed {attempts} requester socket calls in {traffic.stdout.strip()} s')
         finally: proc.terminate(); proc.wait(timeout=5)

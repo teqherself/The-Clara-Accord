@@ -2,22 +2,23 @@
 
 ## v0.3.1 maintenance candidate — 2026-11-27
 
-This branch responds to the second external AI-assisted review. The v1.8 charter remains at eighteen commandments, with a dated non-maleficence erratum. This is a review candidate, not a tagged or independently validated release.
+This maintenance candidate implements corrections from the external AI-assisted reviews. Charter v1.8.1 retains eighteen commandments and includes the non-maleficence clarification. Review history and earlier test results are recorded in [REVIEWS.md](../../REVIEWS.md).
 
 ### Corrective changes
 
 - Registration requires a distinct designated primary and backup lead. The backup can resolve an objection if the primary raised it, is disabled, or the deadline has elapsed. Neither can close their own objection; closure requires rationale and fresh approval. Lead and reviewer identities are synthetic.
 - Exceptional Level 4 plans require four distinct core reviewer role labels: operational authority, technical safety, ethics and rights, and independent oversight. Every predetermined additional reviewer must also approve. Role labels do not prove human competence or independence.
-- Successful audit events identify the authenticated synthetic actor. Service-interface denials are recorded in separate bounded transactions when integrity permits; an unverified claimed identity is not attributed as an authenticated actor. Tokens and raw action values are not logged. Trusted direct class calls are not a public interface and do not automatically record refusals; unverifiable storage can prevent denial logging.
+- Successful audit entries identify the authenticated synthetic actor. Requester attempts to invoke control operations, requester refusals and rate-limit decisions are grouped by event type, operation and verified account when available. Each group records first and last occurrence times and a count. An unattributed group is returned with `actor: null`. Wrong-peer and malformed traffic use separate aggregate counters. Requester groups omit tokens, claimed IDs, plan digests and action values.
+- The requester socket uses a global budget of 8 requests per second with a burst of 16, and an authenticated-account budget of 2 per second with a burst of 4. These are sandbox defaults. The global budget covers well-formed requester operations before database access. The account budget applies after authentication. Budgets reset on restart and do not limit connection rates or the cost of verifying admitted requests.
+- The service batches requester security counters and groups at most once per monotonic second. A restart can lose unflushed increments. `--retention` sets the age limit for successful requester audit entries and for groups based on their latest occurrence. `--control-retention` independently sets the age limit for control-plane audit entries, including control refusals. Both default to 86400 seconds. Fixed-name junk counters are cumulative. Retention preserves replay state and effects.
+- On the control socket, send `inspect` with an `admin` credential. A successful call returns verified persisted counters, the latest 100 groups, the total group count and separately sampled pending counts. It leaves the database seal and checkpoint unchanged. Unavailable integrity can prevent inspection and audit persistence.
 - A maintenance fault marks execution unavailable until successful maintenance, without terminating the service loop. Other transaction integrity and permission checks remain in force.
-- Offline clock recovery and checkpoint reconciliation require the administrator credential and service lock. Stop the daemon and invoke the same sandbox service arguments with `--recover clock` or `--recover checkpoint`. Enter the administrator token when prompted. Clock recovery is allowed only after a corrected backwards jump relative to the sealed clock. Checkpoint reconciliation requires an authenticated successor of the current checkpoint. Both invalidate pending plans and clear approvals; consumed plans, recorded effects and unresolved objections remain. Neither recovery operation executes or automatically retries an action. Inspect recorded effects before proceeding. A failed recovery or unverifiable state remains closed.
+- Offline recovery requires the administrator credential and service lock. Stop the daemon and invoke the same sandbox service arguments with `--recover clock`, `--recover checkpoint` or `--recover combined`. Enter the administrator token when prompted. Clock recovery requires a clock reading below the sealed timestamp. Checkpoint reconciliation requires an authenticated one-commit successor of the stored checkpoint. Combined recovery requires both conditions. Recovery voids pending plans and clears approvals while preserving consumed plans, effects and unresolved objections. Check recorded effects before requesting further action. A failed recovery or unverifiable state remains closed.
 - The schema and action-hash domain have changed. Bootstrap a fresh disposable database; there is no migration or supported production recovery from the previous schema.
 
 ### Current evidence and reproducibility
 
-Local Python 3.13.5 / pytest 9.0.2 run: v0.1 **13 passed (0.05 s)**; v0.2 **15 passed (1.87 s)**; corrected v0.3.1 **35 passed (19.22 s)**, including the adapted kernel-level separate-UID test and 19 maintenance regression checks. Both v0.3.1 test files are now committed on this branch. The old 16-check result applies only to the historical v0.3 source. The original historical test package remains separate.
-
-From the repository root, run each suite in its own process:
+Run each suite in its own process from the repository root on Linux.
 
 ```sh
 python -m pip install pytest==9.0.2
@@ -28,14 +29,7 @@ python -m pytest -q -rs tests
 (cd engine/v03 && python -m pytest -q -rs)
 ```
 
-The Linux separate-UID integration test requires a disposable root-capable harness and runs the service and requester as unprivileged accounts. It is skipped by ordinary unprivileged CI; no elevated privileges are needed for other checks. CI configuration is published; CI outcome and independent human review are not yet established.
-
-Exact current tested Git blob hashes:
-- `engine/v03/service.py`: `50e030669cf273549a46d2d192b98db70f4b790e`
-- `engine/v03/test_service.py`: `5cb0de8a7dda4705aeb02ec8553b2eb41db920d2`
-- `engine/v03/test_recovery.py`: `0a6448d45984e6cee5ae7abb447a2a90689640ba`
-
-These hashes were retrieved from GitHub and matched the local tested files. The v0.1 and v0.2 source and test hashes also matched their unchanged repository versions. These 63 checks are component results, not 63 ethical scenario verdicts.
+Use the [PR #2 checks](https://github.com/teqherself/The-Clara-Accord/pull/2/checks) for results tied to the commit under review. The separate Linux isolation job runs a disposable root-capable harness with unprivileged service and requester accounts. It includes a paced three-second socket check. The unprivileged suite contains a deterministic 30-second simulated traffic check that verifies admission and bounds the frequency of audit writes. These component checks leave independent human review and release approval outstanding.
 
 ### Residual limitations
 
@@ -81,11 +75,3 @@ For a future disposable sandbox deployment, use a dedicated unprivileged Linux s
 Remaining limitations: synthetic tokens do not prove a human identity, qualifications, consent or independence; trusted operators and the host OS remain in the trust boundary. Root or service-account compromise, simultaneous restoration of the database and checkpoint, and compromise of the integrity key are not solved. There is no independent remote witness, hardened clock, external secret manager, real human notification or backup review-lead delivery, admin credential rotation/recovery workflow, production denial-of-service protection, or independently verified objection evidence. The full-state HMAC is intentionally simple and not scalable. Audit retention does not purge all other state, enforce legal holds, or guarantee erasure of backups. No live execution or long-running safe interruption is implemented. No real human review or model-behaviour trials have taken place; all 39 full ethical scenarios remain without a comprehensive PASS verdict.
 
 Software: MIT. Charter documentation: CC BY 4.0.
-
-## Third-review release-blocker corrections — 2026-11-27
-
-The maintainer supplied a third external AI-assisted review of commit 18b9f4e. It reported 13/13 v0.1, 15/15 v0.2, 35/35 candidate tests on three runs, 2/2 prompt tests, matching hashes, and 34 passed/1 skipped under an unprivileged account. It identified combined checkpoint/clock failure and refusal-log eviction by junk traffic, plus wording/version and isolation fixture/CI improvements. This is not independent human review.
-
-Both new targeted regression tests failed before changes. The corrected local v0.3.1 suite passed 38 tests (21.49 s); the revised portable UID isolation fixture separately passed (17.13 s). Current published blob hashes: service.py b22d2977b3e9ca1d5c3124b4e867ba4fcdcfb828; test_recovery.py cc8f4e50c0252505445e2df6bc80e2875e05113f; test_service.py 4eb0c72f0d32f0a7a21091f1ceb0c05c0c0da838.
-
-Offline combined recovery requires an authenticated successor of the stored checkpoint and a backwards clock relative to the sealed timestamp. It requires administrator authorisation, voids pending plans, clears approvals, preserves effects and unresolved objections, and never retries execution. Invoke the stopped service with its ordinary sandbox arguments plus `--recover combined`. Wrong-peer and malformed traffic are aggregated in separate fixed-size counters, flushed at most once per monotonic second. Unauthenticated requester refusals have a separate capped partition; authenticated and control-plane audit evidence is not evicted by that cap. Counters may lose unflushed increments on interruption; this limits audit write amplification, not connection rates or all denial-of-service risks. Time-based retention still applies; no legal holds or production audit guarantees. New disposable database required. The charter is v1.8.1, with no new commandments; the action digest domain names v1.8.1. A dedicated hosted CI job is configured for the separate-UID test using a disposable privileged harness, while the service and requester run unprivileged. CI outcome and outside human review remain outstanding; no merge/tag or v0.4.

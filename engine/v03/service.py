@@ -300,14 +300,16 @@ class ProtectedGate(Gate):
         with self.junk_lock:
             self.junk_pending[kind]=min(2**63-1,self.junk_pending[kind]+1)
 
-    def count_event(self, kind, op, actor='unverified'):
+    def count_event(self, kind, op, actor=None):
         # Closed vocabulary. Actor is either a successfully authenticated account
         # or the shared unverified bucket. Never key by payload, token or claimed name.
         if kind not in ('privileged_attempt','refused','rate_limited') or op not in OPERATIONS:
             raise ValueError('unknown event')
         now=float(self.raw_clock())
         if not math.isfinite(now): raise Denied('invalid clock')
-        key=(kind,op,actor)
+        # Empty IDs cannot be registered, so an unverified request cannot share an
+        # audit group with a real account whose ID happens to be "unverified".
+        key=(kind,op,actor if actor is not None else '')
         with self.junk_lock:
             first,last,count=self.event_pending.get(key,(now,now,0))
             self.event_pending[key]=(min(first,now),max(last,now),min(2**63-1,count+1))
@@ -348,7 +350,7 @@ class ProtectedGate(Gate):
             self.auth(c,'admin',admin,'admin')
             counters=dict(c.execute('SELECT kind,count FROM junk_counts'))
             events=[dict(zip(('kind','operation','actor','first_at','last_at','count'),row))
-                    for row in c.execute('SELECT kind,operation,actor,first_at,last_at,count FROM request_events ORDER BY last_at DESC,kind,operation,actor LIMIT 100')]
+                    for row in c.execute("SELECT kind,operation,nullif(actor,''),first_at,last_at,count FROM request_events ORDER BY last_at DESC,kind,operation,actor LIMIT 100")]
             total=c.execute('SELECT count(*) FROM request_events').fetchone()[0]
         with self.junk_lock:
             pending_junk=self.junk_pending.copy()
@@ -357,14 +359,15 @@ class ProtectedGate(Gate):
 
     def maintenance(self, retention):
         """Record overdue escalations once. Remove aged audit events only; keep replay tombstones."""
-        if not 60 <= retention <= 31536000: raise Denied('invalid retention')
+        control_retention=self.control_retention if self.control_retention is not None else retention
+        if not all(60 <= period <= 31536000 for period in (retention,control_retention)):
+            raise Denied('invalid retention')
         self.flush_junk()
         with self.tx() as c:
             now=self.clock()
             for oid,key in c.execute('SELECT id,plan FROM objections WHERE closed=0 AND deadline<=?',(now,)).fetchall():
                 if c.execute('INSERT OR IGNORE INTO escalations VALUES (?,?)',(oid,now)).rowcount:
                     self.log(c,'escalation_required',key)
-            control_retention=self.control_retention if self.control_retention is not None else retention
             removed=c.execute("DELETE FROM audit WHERE (coalesce(plane,'control')='control' AND at<?) OR (plane='request' AND at<?)",(now-control_retention,now-retention)).rowcount
             removed+=c.execute('DELETE FROM request_events WHERE last_at<?',(now-retention,)).rowcount
             if removed: self.log(c,'audit_retention_purge','')
@@ -384,22 +387,34 @@ class ProtectedGate(Gate):
             # of argument shape. Identity is not verified on a forbidden operation.
             if op not in ('execute','object'):
                 self.count_event('privileged_attempt',op); return
-            if not isinstance(args,dict):
+            if not self.valid_request_args(op,args):
                 self.count_junk('malformed_request'); return
-            self.count_event('rate_limited' if getattr(self.local,'rate_limited',False) else 'refused',op,authenticated or 'unverified')
+            self.count_event('rate_limited' if getattr(self.local,'rate_limited',False) else 'refused',op,authenticated)
             return
         if not isinstance(args,dict):
             self.count_junk('malformed_control'); return
         claimed='admin' if 'admin' in args else args.get('actor')
         key=''
         obj=args.get('a')
-        if isinstance(obj,dict) and set(obj)=={'kind','resource','value','nonce'} and all(isinstance(v,str) and 0<len(v)<=1024 for v in obj.values()):
+        if self.valid_action(obj):
             key=Action(**obj).digest()
         try:
             with self.tx() as c:
                 known=isinstance(claimed,str) and c.execute('SELECT 1 FROM actors WHERE id=?',(claimed,)).fetchone()
                 self.log(c,op,key,'denied',authenticated or 'unauthenticated',claimed if known and claimed!=authenticated else None,plane='control')
         except Denied: pass
+
+    @staticmethod
+    def valid_action(obj):
+        return (isinstance(obj,dict) and set(obj)=={'kind','resource','value','nonce'}
+                and all(isinstance(v,str) and 0<len(v)<=1024 for v in obj.values()))
+
+    def valid_request_args(self, op, args):
+        required={'a','actor','token'}
+        allowed=required|{'ttl'} if op=='object' else required
+        return (isinstance(args,dict) and required<=args.keys()<=allowed
+                and isinstance(args['actor'],str) and isinstance(args['token'],str)
+                and self.valid_action(args['a']))
 
     def dispatch(self, plane, request):
         self.local.actor=None
@@ -412,6 +427,8 @@ class ProtectedGate(Gate):
                     raise Denied('operation forbidden')
                 if not isinstance(op,str) or op not in ('execute','object'):
                     raise Denied('invalid operation')
+                if not self.valid_request_args(op,request.get('args')):
+                    raise Denied('invalid arguments')
                 if not self.take_budget(('global',),self.global_rate,self.global_burst):
                     self.local.rate_limited=True
                     raise Denied('request rate limited')
@@ -433,7 +450,7 @@ class ProtectedGate(Gate):
         if op=='object' and plane=='request': args=dict(args,requester_only=True)
         if 'a' in args:
             obj=args['a']
-            if not isinstance(obj,dict) or set(obj)!={'kind','resource','value','nonce'} or not all(isinstance(v,str) and 0<len(v)<=1024 for v in obj.values()): raise Denied('invalid action')
+            if not self.valid_action(obj): raise Denied('invalid action')
             args=dict(args,a=Action(**obj))
         return method(**args)
 

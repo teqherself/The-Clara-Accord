@@ -29,5 +29,5 @@ jobs:
           python-version: '3.13'
       - run: python -m pip install pytest==9.0.2
       - name: Run separate-UID isolation test
-        run: sudo -- "$(command -v python)" -m pytest -q -rs test_service.py -k kernel_boundary_and_restart
+        run: sudo -- "$(command -v python)" -m pytest -q -rsP test_service.py -k kernel_boundary_and_restart
         working-directory: engine/v03

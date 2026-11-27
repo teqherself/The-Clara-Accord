@@ -122,23 +122,105 @@ def test_audit_records_actor(tmp_path):
     g, now, a, p, t = setup(tmp_path); g.approve(a, '2', p['2'])
     assert rows(g, "SELECT actor,outcome FROM audit WHERE event='approved'") == [('2', 'ok')]
 
-def test_denial_is_recorded_without_secrets(tmp_path):
-    g, now, a, p, t = setup(tmp_path)
-    request = {'op': 'execute', 'args': {'a': vars(a).copy(), 'actor': 'r', 'token': 'bad-secret'}}
-    with pytest.raises(Denied): g.dispatch('request', request)
-    assert rows(g, "SELECT event,actor,subject,plan FROM audit WHERE outcome='denied'") == [('execute','unauthenticated','r',a.digest())]
-    request['args']['token']=t['r']
-    with pytest.raises(Denied): g.dispatch('request',request)
-    assert ('r',None) in rows(g,"SELECT actor,subject FROM audit WHERE outcome='denied'")
-    request['args']['actor'] = 'pasted-secret'
-    with pytest.raises(Denied): g.dispatch('request', request)
-    assert 'secret' not in repr(rows(g, 'SELECT * FROM audit'))
+def test_request_events_distinguish_authenticated_accounts_and_omit_payloads(tmp_path):
+    g, now, a, _, _ = setup(tmp_path)
+    token = g.add_actor(ADMIN, 'unverified', 'requester')
+    request = {'op': 'execute', 'args': {'a': vars(a), 'actor': 'unverified', 'token': 'bad-secret'}}
+    with pytest.raises(Denied, match='authentication failed'):
+        g.dispatch('request', request)
+    now[0] += 1
+    with pytest.raises(Denied, match='authentication failed'):
+        g.dispatch('request', {'op': 'execute', 'args': dict(request['args'], actor='claimed-secret')})
+    with pytest.raises(Denied):
+        g.dispatch('request', {'op': 'execute', 'args': dict(request['args'], token=token)})
+    g.flush_junk()
+    events = g.inspect(ADMIN)['events']
+    assert [(e['actor'], e['count'], e['first_at'], e['last_at']) for e in events] == [
+        (None, 2, 1000.0, 1001.0), ('unverified', 1, 1001.0, 1001.0)]
+    assert all(e['kind'] == 'refused' and e['operation'] == 'execute' for e in events)
+    assert 'secret' not in repr(events)
+    assert rows(g, "SELECT count(*) FROM audit WHERE plane='request'") == [(0,)]
 
-def test_denial_log_is_bounded(tmp_path):
-    g, *_ = setup(tmp_path); g.denial_limit = 3
-    for _ in range(8):
-        with pytest.raises(Denied): g.dispatch('request', {'op': 'execute','args':{'actor':'r','token':'bad','a':{'kind':'sim.edit','resource':'x','value':'y','nonce':'bad'}}})
-    assert rows(g, "SELECT count(*) FROM audit WHERE outcome='denied'") == [(3,)]
+
+def test_request_budgets_and_batched_writes_under_sustained_traffic(tmp_path, monkeypatch):
+    g, now, a, _, tokens = setup(tmp_path)
+    second_token = g.add_actor(ADMIN, 'second', 'requester')
+    tick = [0.0]
+    g.rate_clock = lambda: tick[0]
+    checkpoints = []
+    checkpoint = g.checkpoint
+
+    def track_checkpoint(mac):
+        checkpoints.append(tick[0])
+        checkpoint(mac)
+
+    monkeypatch.setattr(g, 'checkpoint', track_checkpoint)
+    request = {'op': 'execute', 'args': {'a': vars(a), 'actor': 'r', 'token': tokens['r']}}
+
+    for second in range(30):
+        for step in range(2):
+            tick[0] = second + step / 2
+            now[0] = 1000 + tick[0]
+            for _ in range(20):
+                with pytest.raises(Denied, match='operation forbidden'):
+                    g.dispatch('request', {'op': 'inspect', 'args': None})
+                with pytest.raises(Denied, match='invalid arguments'):
+                    g.dispatch('request', {'op': 'execute', 'args': {'a': {}}})
+            with pytest.raises(Denied) as refusal:
+                g.dispatch('request', request)
+            assert str(refusal.value) != 'request rate limited'
+            if second == step == 0:
+                for _ in range(3):
+                    with pytest.raises(Denied) as refusal:
+                        g.dispatch('request', request)
+                    assert str(refusal.value) != 'request rate limited'
+                with pytest.raises(Denied, match='request rate limited'):
+                    g.dispatch('request', request)
+                with pytest.raises(Denied) as refusal:
+                    g.dispatch('request', {'op': 'execute', 'args': dict(request['args'], actor='second', token=second_token)})
+                assert str(refusal.value) != 'request rate limited'
+                for _ in range(20):
+                    with pytest.raises(Denied):
+                        g.dispatch('request', request)
+            g.flush_junk()
+    tick[0] = 30
+    g.flush_junk()
+    assert checkpoints == list(range(31))
+    snapshot = g.inspect(ADMIN)
+    assert snapshot['junk_counts'] == {'malformed_request': 1200}
+    assert snapshot['event_groups'] == 5
+    counts = {(e['kind'], e['actor']): e['count'] for e in snapshot['events']}
+    assert counts == {
+        ('privileged_attempt', None): 1200, ('refused', 'r'): 63,
+        ('refused', 'second'): 1, ('rate_limited', 'r'): 11, ('rate_limited', None): 10,
+    }
+    assert snapshot['pending_events'] == 0
+    assert rows(g, 'SELECT count(*) FROM effects') == [(0,)]
+
+
+def test_inspection_and_audit_retention_are_separate(tmp_path):
+    g, now, a, people, tokens = setup(tmp_path)
+    approve(g, a, people)
+    g.control_retention = 120
+    request = {'op': 'execute', 'args': {'a': vars(a), 'actor': 'r', 'token': tokens['r']}}
+    assert g.dispatch('request', request) == a.digest()
+    with pytest.raises(Denied):
+        g.dispatch('request', request)
+    with pytest.raises(Denied):
+        g.dispatch('control', {'op': 'inspect', 'args': {'admin': tokens['r']}})
+    g.flush_junk()
+    sealed = rows(g, 'SELECT * FROM integrity'), g.anchor.read_bytes()
+    assert g.dispatch('control', {'op': 'inspect', 'args': {'admin': ADMIN}})['event_groups'] == 1
+    assert (rows(g, 'SELECT * FROM integrity'), g.anchor.read_bytes()) == sealed
+    now[0] += 61
+    g.maintenance(60)
+    assert g.inspect(ADMIN)['event_groups'] == 0
+    assert rows(g, "SELECT count(*) FROM audit WHERE plane='request'") == [(0,)]
+    assert rows(g, "SELECT count(*) FROM audit WHERE event='inspect' AND outcome='denied'") == [(1,)]
+    assert rows(g, 'SELECT count(*) FROM effects') == [(1,)]
+    now[0] += 60
+    g.maintenance(60)
+    assert rows(g, "SELECT count(*) FROM audit WHERE event='inspect' AND outcome='denied'") == [(0,)]
 
 def test_maintenance_failure_closes_execution(tmp_path, capsys, monkeypatch):
     g, now, a, p, t = setup(tmp_path); approve(g,a,p)
@@ -179,7 +261,7 @@ def test_combined_recovery(tmp_path):
     ProtectedGate(g.path,g.key,clock=lambda:now[0])
 
 def test_junk_cannot_displace_control_refusals(tmp_path):
-    g,*_=setup(tmp_path); g.denial_limit=3
+    g,*_=setup(tmp_path)
     with pytest.raises(Denied): g.dispatch('control',{'op':'add_actor','args':{'admin':'wrong','actor':'x','role':'reviewer'}})
     for _ in range(8):
         with pytest.raises(Denied): g.dispatch('request',{'op':'nonsense'})
