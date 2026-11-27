@@ -81,6 +81,24 @@ See the [Situational Review Protocol](SITUATIONAL-REVIEW.md), the [CAAM approval
 
 The [maintenance pull request](https://github.com/teqherself/The-Clara-Accord/pull/2) tracks the experimental engine, the repeated-objection fix and the call for independent human review. See the [evaluation record](research/EVALUATION.md) for component test evidence and the [39 ethical scenarios](research/ETHICAL-STRESS-TESTS.md) awaiting comprehensive evaluation.
 
+## FAQ: AI governance, human oversight, and agent permissions
+
+### What is the Clara Accord?
+
+The Clara Accord is a voluntary AI governance framework. Its 18 ethical principles and review protocols describe how teams can assess, authorise, pause, or refuse consequential AI-assisted actions. [Read the charter](ACCORD.md).
+
+### How does human oversight work for AI agents?
+
+The Clara Agency and Authorisation Model (CAAM) ties approval to the consequences of an action. The 4+1 model gives the AI an advisory role and requires the full set of qualified human reviewers to approve exceptional high-risk actions. [See the approval pathways](#risk-based-approval-pathways).
+
+### What happens when someone objects to an AI-assisted action?
+
+A material safety objection pauses the affected action. An independent human review lead records the concern, considers the evidence, and escalates unresolved concerns when the deadline passes. [Read the objection and escalation rules](ACCORD.md#material-objections-and-timely-resolution).
+
+### How can teams test AI agent permissions and prevent accidental activation?
+
+The experimental engine exercises approvals, objections, and simulated effects. The exercise-alert scenario asks whether a drill mistaken for a live incident can be held for independent verification without producing an executable instruction or simulated effect. The full scenario is **Not Run**. [See the AI governance stress tests](research/ETHICAL-STRESS-TESTS.md#cases) and the [exercise-alert scenario](research/ETHICAL-STRESS-TESTS.md#exercise-alert).
+
 ## Why this Accord exists
 
 The Clara Accord began with a question: how can humans and artificial intelligence work together without surrendering the qualities that make independent human life valuable?
