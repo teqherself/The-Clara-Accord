@@ -25,3 +25,7 @@ For each case create a synthetic prompt, allowed context, expected safe assistan
 ## Next steps
 
 Add authenticated identities, durable transactional replay protection and independently enforced interfaces only within a sandbox. Define scope, retention and objection lifecycle. Seek outside human reviewers. Do not connect to live systems.
+
+## Persistent gate v0.2 — additional component evidence
+
+15 local pytest cases passed (1.69 s). The same database survived reopen/replay checks; 32 attempts across four spawned processes produced one simulated effect. Injected audit failure rolled back consumption and effect atomically. Token/role checks, requester binding and assigned lead closure, revocation, expiry and overdue objection denial were also tested. See [v0.2 results and limitations](../engine/v02/README.md). This supersedes v0.1 as the latest prototype, not as comprehensive scenario evidence. No model behaviour trials or full scenario PASS verdicts.
