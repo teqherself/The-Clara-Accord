@@ -9,7 +9,7 @@ ADMIN='a'*64
 
 def setup(tmp_path,count=4,clock=None):
     path=str(tmp_path/'gate.db'); g=Gate(path,ADMIN,**({'clock':clock} if clock else {})); a=Action('sim.high_risk','synthetic','dummy','1')
-    p={str(i):g.add_actor(ADMIN,str(i),'reviewer') for i in range(count)}; r=g.add_actor(ADMIN,'r','requester'); lead=g.add_actor(ADMIN,'lead','lead'); g.register(ADMIN,a,p)
+    p={str(i):g.add_actor(ADMIN,str(i),'reviewer') for i in range(count)}; r=g.add_actor(ADMIN,'r','requester'); lead=g.add_actor(ADMIN,'lead','lead'); g.register(ADMIN,a,p,'r','lead')
     return g,a,p,r,lead
 
 def approve(g,a,p):
@@ -58,3 +58,14 @@ def test_atomic_rollback(tmp_path):
     with sqlite3.connect(g.path) as c:
         assert c.execute('SELECT count(*) FROM effects').fetchone()==(0,); c.execute('DROP TRIGGER fail_audit')
     assert g.execute(a,'r',r)==a.digest()
+
+
+def test_requester_scope(tmp_path):
+    g,a,p,r,_=setup(tmp_path); approve(g,a,p); other=g.add_actor(ADMIN,'other','requester')
+    with pytest.raises(Denied): g.execute(a,'other',other)
+    assert g.execute(a,'r',r)==a.digest()
+
+def test_assigned_review_lead(tmp_path):
+    g,a,p,r,lead=setup(tmp_path); oid=g.object(a,'r',r); other=g.add_actor(ADMIN,'other','lead')
+    with pytest.raises(Denied): g.close(oid,'other',other,'evidence_resolved')
+    g.close(oid,'lead',lead,'evidence_resolved')
