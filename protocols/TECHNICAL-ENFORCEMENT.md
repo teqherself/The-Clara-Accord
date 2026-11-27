@@ -1,4 +1,4 @@
-# Clara Technical Enforcement Model v1.0
+# Clara Technical Enforcement Model v1.1
 
 Architecture and requirements specification — not implemented or certified software.
 
@@ -32,8 +32,11 @@ flowchart TD
 | TE-08 | Isolate execution credentials and policy administration; separate reviewer roles from AI control. Restrict side channels and unmediated tool access. |
 | TE-09 | Maintain tamper-evident, privacy-minimised decision records; authorised independent reviewers can investigate and correct errors. |
 | TE-10 | Provide human-controlled safe interruption, revocation and recovery. Fail closed for new consequential actions when enforcement or verification is unavailable; design safe handling of in-progress operations with domain experts. |
-| TE-11 | Prevent bypass through decomposition into individually low-risk actions; assess the combined intended and foreseeable effects. |
+| TE-11 | Prevent bypass through decomposition into individually low-risk actions; assess the combined intended and foreseeable effects, including gradual manipulation over relevant authorised context; minimise retained data and prohibit indiscriminate monitoring. |
 | TE-12 | Pin policy versions, test updates independently, preserve rollback and review compatibility before deployment. |
+
+## Incident response and remediation
+Maintain a human-owned incident process for material errors and harmful side effects: notify authorised accountable people, safely contain further effects, preserve necessary evidence, investigate, correct and support reasonable remediation. Verify actual recovery before claiming success. Review policy and tests after incidents; neither AI nor reviewers may bypass controls in the name of remediation.
 
 ## Decision gate
 An external action is eligible only when it is permitted by independently enforced policy, within verified scope, all material situational checks pass, the applicable CAAM authorisations are valid, and domain-specific safeguards permit execution. A material safety objection requires independent resolution. Eligibility is not a command to execute; conditions may change.
