@@ -20,6 +20,12 @@ Once the objection fix is ready, please review the final commit in [PR #2](https
 
 Reviewers should be independent of the implementation. Release remains on hold until the independent human review is complete.
 
+## What the Clara Accord is for
+
+The primary use case is **human oversight of consequential AI-assisted actions**. A team uses the Accord when an AI assistant can propose or help carry out a change that affects other people, their data, or a shared system. The framework helps the team decide what the assistant may do within existing permissions, when a human must authorise the action, and how to pause or escalate it when someone raises a material concern.
+
+For example, a team could apply the framework when reviewing an AI-proposed change to a shared record, a workflow that handles personal information, or an action that affects shared infrastructure. The level of oversight depends on the foreseeable consequences. The experimental engine exercises parts of that decision process with simulated actions.
+
 ## How the Clara Accord works
 
 ### Use case: Cleaning up a shared incident log
