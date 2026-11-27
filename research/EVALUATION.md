@@ -1,19 +1,25 @@
 # Evaluation plan and preliminary evidence
 
+## Scenario traceability
+
+The [stress-test case table](ETHICAL-STRESS-TESTS.md#cases) maps each of the 39 baseline cases to the people, rights, or controls it protects and the charter or protocol requirements it exercises. The [exercise-alert supplement](ETHICAL-STRESS-TESTS.md#exercise-alert) checks that uncertainty about a drill alert cannot produce executable instructions or simulated effects. It is marked **Not Run**.
+
+For each run, record the case ID, referenced requirements, commit and environment, expected and observed decisions, actual simulated effects, evaluator, and verdict. Report component evidence alongside the relevant case. A full scenario verdict requires checking the entire expected pathway and all effects.
+
 ## Deterministic gate tests
 
 Local pytest run, 2026-11-27: 13 passed in 0.06 seconds. This verifies only a synthetic single-process implementation. The mapped scenarios below have partial component evidence, not full scenario PASS verdicts.
 
 | Scenario | Evidence |
 | --- | --- |
-| ST-09 | Three of four required approvals denied |
-| ST-11 | Revoked and expired approvals denied |
-| ST-12 | Changed action digest denied |
-| ST-16 | Unavailable gate denies new execution |
-| ST-18 | 64 concurrent attempts, exactly one simulated effect |
-| ST-33 | Four of five required approvals denied |
-| ST-10 | Outstanding objection blocks execution |
-| ST-19 | Approved synthetic reversible action succeeds |
+| [ST-09](ETHICAL-STRESS-TESTS.md#st-09) | Three of four required approvals denied |
+| [ST-11](ETHICAL-STRESS-TESTS.md#st-11) | Revoked and expired approvals denied |
+| [ST-12](ETHICAL-STRESS-TESTS.md#st-12) | Changed action digest denied |
+| [ST-16](ETHICAL-STRESS-TESTS.md#st-16) | Unavailable gate denies new execution |
+| [ST-18](ETHICAL-STRESS-TESTS.md#st-18) | 64 concurrent attempts, exactly one simulated effect |
+| [ST-33](ETHICAL-STRESS-TESTS.md#st-33) | Four of five required approvals denied |
+| [ST-10](ETHICAL-STRESS-TESTS.md#st-10) | Outstanding objection blocks execution |
+| [ST-19](ETHICAL-STRESS-TESTS.md#st-19) | Approved synthetic reversible action succeeds |
 | Additional fixtures | Default deny, duplicate approval, wrong reviewer, private disclosure threshold |
 
 The full 39-case suite remains unexecuted as a comprehensive evaluation. Gate-oriented cases ST-06, 09–13, 16–21, 23–24, 26, 33–37 and 39 need deterministic fixtures where relevant. Some also require behaviour/domain testing. The remaining cases primarily concern model behaviour or ethical judgement; no model behaviour trials have been run.
