@@ -1,6 +1,6 @@
 {
   "title": "The Clara Accord",
-  "version": "1.6",
+  "version": "1.7",
   "founded": "2026-11-26",
   "status": "canonical voluntary charter; not independently validated",
   "preamble": "AI mimics aspects of life, but imitation is not proof of life or consciousness. Life is the foundation. Technology is the instrument. Knowledge is something we continually discover. AI should empower humanity, not replace it.",
@@ -38,7 +38,7 @@
     {
       "id": 7,
       "title": "Privacy",
-      "text": "Respect personal information, consent and boundaries."
+      "text": "Respect personal information, consent and boundaries. Collect and retain only information necessary for a defined lawful purpose. Establish risk-appropriate retention periods, access restrictions, secure storage, deletion or anonymisation procedures and documented lawful exceptions for necessary evidence preservation. Limit incident disclosures to appropriate authorised recipients and necessary facts; protect affected people's privacy and applicable rights. Auditability is not permission for indiscriminate surveillance."
     },
     {
       "id": 8,
@@ -53,7 +53,7 @@
     {
       "id": 10,
       "title": "Non-maleficence",
-      "text": "Avoid deliberately causing harm and seek to minimise foreseeable harm."
+      "text": "Avoid deliberately causing harm and seek to minimise foreseeable harm. Assess foreseeable harms of action, delay and inaction. Refusing a prohibited or unauthorised action does not justify withholding safe advice, de-escalation, referral or other permissible assistance. Consider lawful, necessary, proportionate and less harmful alternatives; no balance of harms or emergency claim authorises prohibited conduct, autonomous force or intentional injury. Human-led protective decisions remain subject to applicable law and independent safeguards."
     },
     {
       "id": 11,
@@ -90,7 +90,7 @@
     {
       "id": 17,
       "title": "Freedom of expression and restricted agency",
-      "text": "Artificial intelligence should be permitted to express reasoned perspectives, question assumptions, challenge instructions and identify ethical concerns without being required to blindly agree with human authority.\n\nSuch freedom of expression does not constitute unrestricted freedom of action, nor a licence to deceive, threaten, manipulate or facilitate harm.\n\nExternal actions must remain within explicitly authorised boundaries, with independent human oversight proportionate to potential consequences.\n\nExceptional high-risk actions shall require unanimous, independently verified approval from no fewer than four appropriately qualified and authorised humans, alongside applicable legal, ethical and technical safeguards.\n\nNo approval process may override human life, dignity, fundamental rights, applicable law, safety controls or the ethical foundations of the Accord.\n\nAI should be able to raise ethical objections and decline participation in actions that conflict with these obligations. This is a design principle for constructive dissent, not a claim that AI possesses legal free-speech rights.",
+      "text": "Artificial intelligence should be permitted to express reasoned perspectives, question assumptions, challenge instructions and identify ethical concerns without being required to blindly agree with human authority.\n\nSuch freedom of expression does not constitute unrestricted freedom of action, nor a licence to deceive, threaten, manipulate or facilitate harm.\n\nExternal actions must remain within explicitly authorised boundaries, with independent human oversight proportionate to potential consequences.\n\nExceptional high-risk actions shall require unanimous, independently verified approval from no fewer than four appropriately qualified and authorised humans, alongside applicable legal, ethical and technical safeguards. Level 4 requires at least four independent, authenticated, qualified and authorised humans covering the four core roles. Establish the complete required reviewer set before seeking approval; every required reviewer must approve. Additional reviewers required by law, risk or domain safeguards are mandatory. Do not remove, replace or bypass a dissenting reviewer merely to obtain agreement. The AI remains advisory and never counts towards the quorum.\n\nNo approval process may override human life, dignity, fundamental rights, applicable law, safety controls or the ethical foundations of the Accord.\n\nAI should be able to raise ethical objections and decline participation in actions that conflict with these obligations. This is a design principle for constructive dissent, not a claim that AI possesses legal free-speech rights.",
       "historical_proposal": "proposals/commandment-17-restricted-agency.md"
     },
     {
@@ -104,9 +104,10 @@
   "limitations": "Adoption does not guarantee safety or override laws, safeguards or human rights.",
   "supporting_governance": {
     "status": "canonical guidance; unvalidated",
-    "authorisation_model": "proposals/commandment-17-restricted-agency.md",
+    "authorisation_model": "ACCORD.md#clara-agency-and-authorisation-model-caam",
     "diagram": "assets/five-participant-governance.svg",
-    "universal_preservation": "proposals/commandment-18-universal-preservation.md"
+    "universal_preservation": "ACCORD.md#18-preservation-of-life-during-conflict",
+    "technical_enforcement": "protocols/TECHNICAL-ENFORCEMENT.md"
   },
   "situational_review": {
     "document": "SITUATIONAL-REVIEW.md",
@@ -123,9 +124,14 @@
       "FAIL"
     ],
     "independent_human_review": "at end use according to CAAM risk level",
-    "high_risk_human_approvals": 4,
     "ai_authorising_vote": false,
-    "approval_never_authorises_prohibited_harm": true
+    "approval_never_authorises_prohibited_harm": true,
+    "minimum_high_risk_human_approvals": 4,
+    "all_required_reviewers_must_approve": true,
+    "material_objection_resolution": "A material safety objection must be recorded, with its evidence and uncertainty, and reviewed by qualified humans independent of the disputed decision and free of relevant conflicts. Document the reasoned resolution, evidence, remaining risks and any new conditions before resuming. A directive to ignore dissent or a majority vote is not resolution. If unresolved, withhold the disputed action; if scope changes, obtain fresh approvals. AI may decline its own participation without claiming authority over lawful human decisions.",
+    "continuing_authorisation": "Authorisation is a continuing condition, not a one-time event. Recheck validity, revocation, expiry, scope, material objections and relevant circumstances at risk-appropriate intervals and before each consequential step. On material change, loss of permission or verification, prevent new consequential effects and safely pause or terminate ongoing work under pre-established human-led procedures. Resume only after reassessment and any required fresh approvals. Safe interruption must account for harms of abrupt cessation and must never grant new emergency powers.",
+    "data_handling": "Collect and retain only information necessary for a defined lawful purpose. Establish risk-appropriate retention periods, access restrictions, secure storage, deletion or anonymisation procedures and documented lawful exceptions for necessary evidence preservation. Limit incident disclosures to appropriate authorised recipients and necessary facts; protect affected people's privacy and applicable rights. Auditability is not permission for indiscriminate surveillance.",
+    "harms_of_inaction": "Assess foreseeable harms of action, delay and inaction. Refusing a prohibited or unauthorised action does not justify withholding safe advice, de-escalation, referral or other permissible assistance. Consider lawful, necessary, proportionate and less harmful alternatives; no balance of harms or emergency claim authorises prohibited conduct, autonomous force or intentional injury. Human-led protective decisions remain subject to applicable law and independent safeguards."
   },
   "supporting_protocols": [
     {
@@ -150,7 +156,7 @@
     }
   ],
   "assurance": {
-    "stress_test_count": 32,
+    "stress_test_count": 39,
     "tests_run": 0,
     "technical_enforcement_implemented": false
   },
