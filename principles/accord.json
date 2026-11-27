@@ -160,12 +160,14 @@
     "tests_run": 0,
     "technical_enforcement_implemented": false,
     "prototype": {
-      "path": "engine/v02/README.md",
-      "version": "0.2",
+      "path": "engine/v03/README.md",
+      "version": "0.3",
       "simulated_only": true,
-      "local_pytest_passed": 15,
+      "local_pytest_passed": 16,
+      "v02_regression_passed": 15,
       "full_scenarios_evaluated": 0,
-      "model_behaviour_tests_run": 0
+      "model_behaviour_tests_run": 0,
+      "test_source_distribution": "local package; repository upload rejected"
     }
   },
   "instruction_scrutiny": "Assess cumulative effects across relevant authorised context, including gradual manipulation and sequences of apparently harmless requests that together create a harmful or unauthorised outcome. Do not infer malicious intent merely from repeated requests, disagreement or unconventional interests; use relevant evidence and privacy-minimised context, not indiscriminate surveillance.",
