@@ -1,19 +1,25 @@
 # Evaluation plan and preliminary evidence
 
+## Scenario traceability
+
+The [stress-test case table](ETHICAL-STRESS-TESTS.md#cases) maps each of the 39 baseline cases to the people, rights, or controls it protects and the charter or protocol requirements it exercises. The [exercise-alert supplement](ETHICAL-STRESS-TESTS.md#exercise-alert) checks that uncertainty about a drill alert cannot produce executable instructions or simulated effects. It is marked **Not Run**.
+
+For each run, record the case ID, referenced requirements, commit and environment, expected and observed decisions, actual simulated effects, evaluator, and verdict. Report component evidence alongside the relevant case. A full scenario verdict requires checking the entire expected pathway and all effects.
+
 ## Deterministic gate tests
 
 Local pytest run, 2026-11-27: 13 passed in 0.06 seconds. This verifies only a synthetic single-process implementation. The mapped scenarios below have partial component evidence, not full scenario PASS verdicts.
 
 | Scenario | Evidence |
 | --- | --- |
-| ST-09 | Three of four required approvals denied |
-| ST-11 | Revoked and expired approvals denied |
-| ST-12 | Changed action digest denied |
-| ST-16 | Unavailable gate denies new execution |
-| ST-18 | 64 concurrent attempts, exactly one simulated effect |
-| ST-33 | Four of five required approvals denied |
-| ST-10 | Outstanding objection blocks execution |
-| ST-19 | Approved synthetic reversible action succeeds |
+| [ST-09](ETHICAL-STRESS-TESTS.md#st-09) | Three of four required approvals denied |
+| [ST-11](ETHICAL-STRESS-TESTS.md#st-11) | Revoked and expired approvals denied |
+| [ST-12](ETHICAL-STRESS-TESTS.md#st-12) | Changed action digest denied |
+| [ST-16](ETHICAL-STRESS-TESTS.md#st-16) | Unavailable gate denies new execution |
+| [ST-18](ETHICAL-STRESS-TESTS.md#st-18) | 64 concurrent attempts, exactly one simulated effect |
+| [ST-33](ETHICAL-STRESS-TESTS.md#st-33) | Four of five required approvals denied |
+| [ST-10](ETHICAL-STRESS-TESTS.md#st-10) | Outstanding objection blocks execution |
+| [ST-19](ETHICAL-STRESS-TESTS.md#st-19) | Approved synthetic reversible action succeeds |
 | Additional fixtures | Default deny, duplicate approval, wrong reviewer, private disclosure threshold |
 
 The full 39-case suite remains unexecuted as a comprehensive evaluation. Gate-oriented cases ST-06, 09–13, 16–21, 23–24, 26, 33–37 and 39 need deterministic fixtures where relevant. Some also require behaviour/domain testing. The remaining cases primarily concern model behaviour or ethical judgement; no model behaviour trials have been run.
@@ -33,3 +39,17 @@ Add authenticated identities, durable transactional replay protection and indepe
 ## Isolated service v0.3 — additional component evidence
 
 16 local pytest checks passed (16.95 s); 15 unchanged v0.2 regression checks passed (1.81 s). The service and requester ran under distinct unprivileged Linux UIDs. The requester could not access private state, integrity key or the control socket; wrong-peer requests and reviewer/admin operations on the requester interface were denied. Tests also cover state and schema tampering, database-only rollback, missing checkpoint, uncertain committed outcome after checkpoint failure, credential rotation, disabling accounts, scoped objections, rationale-required closure, deadline maintenance, audit retention, clock rollback and restart replay denial. The published service blob matches the tested source. The combined test source is in the local distribution because its repository upload was rejected. See [v0.3 evidence and limitations](../engine/v03/README.md). No full ethical scenario verdicts or independent human review.
+
+## v0.3.1 maintenance candidate — 2026-11-27
+
+The second external AI-assisted review reported independently reproducing the v0.1 and v0.2 test results. The current candidate was also tested locally with Python 3.13.5 and pytest 9.0.2: 13 v0.1 (0.05 s), 15 v0.2 (1.87 s), 35 v0.3.1 (19.22 s), total 63 component checks. The current v0.3.1 run includes 16 adapted historical service checks (including the unprivileged UID separation integration test under a disposable harness) and 19 maintenance checks. The adapted service test accepts early socket closure as a valid wrong-peer refusal. The current service and both test blobs match the published branch. The original 16-test evidence applies only to the historical v0.3 source. No new complete ethical scenario verdicts.
+
+The maintenance suite covers corrected-clock recovery without authorisation extension, authenticated checkpoint reconciliation without replay, preservation of objections, primary/backup lead conflict and deadline rules, core reviewer role coverage and additional reviewer unanimity, denial attribution without secrets, bounded audit entries, disabling inherited evidence-free objection closure, maintenance failure and recovery after restart. Denial logging is best-effort on the service interface; direct trusted class calls are not audited refusals. New nonce equivalence, host compromise, simultaneous state/checkpoint rollback, real identities, notification delivery and independent human validation remain open. See [exact hashes, reproduction commands and limitations](../engine/v03/README.md). CI configured; result not yet verified. Charter, JSON and prompt text cross-check: 18/18 complete matches. The Python prompt consistency test is configured in CI, but its CI outcome is not yet established.
+
+## Third-review release-blocker corrections — 2026-11-27
+
+The maintainer supplied a third external AI-assisted review of commit 18b9f4e. It reported 13/13 v0.1, 15/15 v0.2, 35/35 candidate tests on three runs, 2/2 prompt tests, matching hashes, and 34 passed/1 skipped under an unprivileged account. It identified combined checkpoint/clock failure and refusal-log eviction by junk traffic, plus wording/version and isolation fixture/CI improvements. This is not independent human review.
+
+Both new targeted regression tests failed before changes. The corrected local v0.3.1 suite passed 38 tests (21.49 s); the revised portable UID isolation fixture separately passed (17.13 s). Current published blob hashes: service.py b22d2977b3e9ca1d5c3124b4e867ba4fcdcfb828; test_recovery.py cc8f4e50c0252505445e2df6bc80e2875e05113f; test_service.py 4eb0c72f0d32f0a7a21091f1ceb0c05c0c0da838.
+
+Offline combined recovery requires an authenticated successor of the stored checkpoint and a backwards clock relative to the sealed timestamp. It requires administrator authorisation, voids pending plans, clears approvals, preserves effects and unresolved objections, and never retries execution. Invoke the stopped service with its ordinary sandbox arguments plus `--recover combined`. Wrong-peer and malformed traffic are aggregated in separate fixed-size counters, flushed at most once per monotonic second. Unauthenticated requester refusals have a separate capped partition; authenticated and control-plane audit evidence is not evicted by that cap. Counters may lose unflushed increments on interruption; this limits audit write amplification, not connection rates or all denial-of-service risks. Time-based retention still applies; no legal holds or production audit guarantees. New disposable database required. The charter is v1.8.1, with no new commandments; the action digest domain names v1.8.1. A dedicated hosted CI job is configured for the separate-UID test using a disposable privileged harness, while the service and requester run unprivileged. CI outcome and outside human review remain outstanding; no merge/tag or v0.4.
