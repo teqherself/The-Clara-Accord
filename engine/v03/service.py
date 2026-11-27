@@ -171,7 +171,7 @@ class ProtectedGate(Gate):
 
     def log(self, c, event, key, outcome='ok', actor=None, subject=None, plane=None):
         c.execute('INSERT INTO audit(event,plan,at,actor,outcome,subject,plane) VALUES (?,?,?,?,?,?,?)',
-                  (event,key,self.clock(),actor or self.local.actor or 'system',outcome,subject,plane))
+                  (event,key,self.clock(),actor or self.local.actor or 'system',outcome,subject,plane or ('request' if getattr(self.local,'request_dispatch',False) else 'control')))
 
     def add_actor(self, admin, actor, role, reviewer_role=None):
         if role not in ('reviewer','lead','requester') or not isinstance(actor,str) or not 0<len(actor)<=80:
