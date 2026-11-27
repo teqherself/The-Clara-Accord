@@ -25,10 +25,10 @@ from gate import Gate, Action as BaseAction, Denied, LEVELS
 
 class Action(BaseAction):
     def digest(self):
-        body=json.dumps(['1.8-maintenance/0.3.1', self.kind, self.resource, self.value, self.nonce], separators=(',',':')).encode()
+        body=json.dumps(['1.8.1/0.3.1', self.kind, self.resource, self.value, self.nonce], separators=(',',':')).encode()
         return hashlib.sha256(body).hexdigest()
 
-TABLES = ('actors', 'plans', 'approvals', 'objections', 'effects', 'audit', 'disabled', 'escalations', 'resolutions', 'backups', 'reviewer_roles')
+TABLES = ('actors', 'plans', 'approvals', 'objections', 'effects', 'audit', 'disabled', 'escalations', 'resolutions', 'backups', 'reviewer_roles', 'junk_counts')
 LIMIT = 16384
 CORE_ROLES = ('operational_authority', 'technical_safety', 'ethics_rights', 'independent_oversight')
 OPERATIONS = ('execute','object','add_actor','register','approve','revoke','close','credential','alerts')
@@ -39,6 +39,7 @@ class OutcomeUncertain(Denied):
 class ProtectedGate(Gate):
     """Trusted service only. HMAC state seal and a separately stored checkpoint."""
     denial_limit = 1000
+    JUNK_KINDS = ('wrong_peer', 'malformed_request', 'malformed_control')
 
     def __init__(self, path, key, admin_token=None, clock=time.time, verify=True):
         self.key = key
@@ -48,6 +49,9 @@ class ProtectedGate(Gate):
             raise Denied('missing state or key')
         self.local = threading.local()
         self.operation_lock = threading.RLock()
+        self.junk_lock = threading.Lock()
+        self.junk_pending = {kind: 0 for kind in self.JUNK_KINDS}
+        self.junk_last_flush = None
         self.maintenance_ok = True
         self.raw_clock = clock
         def transaction_clock():
@@ -107,6 +111,7 @@ class ProtectedGate(Gate):
                 c.execute('CREATE TABLE resolutions(oid TEXT PRIMARY KEY, evidence TEXT NOT NULL)')
                 c.execute('CREATE TABLE backups(plan TEXT PRIMARY KEY, actor TEXT NOT NULL)')
                 c.execute('CREATE TABLE reviewer_roles(actor TEXT PRIMARY KEY, role TEXT NOT NULL)')
+                c.execute('CREATE TABLE junk_counts(kind TEXT PRIMARY KEY, count INTEGER NOT NULL)')
                 c.execute('CREATE TABLE integrity(id INTEGER PRIMARY KEY CHECK(id=1), at REAL, mac TEXT, previous TEXT)')
                 previous = ''
             else:
@@ -114,18 +119,18 @@ class ProtectedGate(Gate):
                 if not row or not hmac.compare_digest(row[1], self.seal(c, row[0], row[2])):
                     raise Denied('integrity failure')
                 anchor = read_secret(self.anchor).decode()
-                if recovery == 'checkpoint':
+                if recovery in ('checkpoint','combined'):
                     if hmac.compare_digest(row[1], anchor) or not hmac.compare_digest(row[2], anchor):
                         raise Denied('not reconcilable')
                 elif not hmac.compare_digest(row[1], anchor):
                     raise Denied('checkpoint mismatch')
-                if recovery == 'clock':
+                if recovery in ('clock','combined'):
                     if now >= row[0]: raise Denied('clock recovery not needed')
                 elif now < row[0]: raise Denied('clock rollback')
                 previous = anchor
             yield c
             if self.bootstrap:
-                for column in ('actor', 'outcome', 'subject'):
+                for column in ('actor', 'outcome', 'subject', 'plane'):
                     c.execute(f'ALTER TABLE audit ADD COLUMN {column} TEXT')
             mac=self.seal(c,now,previous)
             c.execute('INSERT OR REPLACE INTO integrity VALUES (1,?,?,?)', (now,mac,previous))
@@ -151,9 +156,9 @@ class ProtectedGate(Gate):
         self.local.actor = actor
         return result
 
-    def log(self, c, event, key, outcome='ok', actor=None, subject=None):
-        c.execute('INSERT INTO audit(event,plan,at,actor,outcome,subject) VALUES (?,?,?,?,?,?)',
-                  (event,key,self.clock(),actor or self.local.actor or 'system',outcome,subject))
+    def log(self, c, event, key, outcome='ok', actor=None, subject=None, plane=None):
+        c.execute('INSERT INTO audit(event,plan,at,actor,outcome,subject,plane) VALUES (?,?,?,?,?,?,?)',
+                  (event,key,self.clock(),actor or self.local.actor or 'system',outcome,subject,plane))
 
     def add_actor(self, admin, actor, role, reviewer_role=None):
         if role not in ('reviewer','lead','requester') or not isinstance(actor,str) or not 0<len(actor)<=80:
@@ -201,6 +206,15 @@ class ProtectedGate(Gate):
             c.execute('DELETE FROM approvals')
             c.execute('UPDATE plans SET used=1 WHERE used=0')
             self.log(c,'checkpoint_reconciled','')
+            return c.execute('SELECT count(*) FROM effects').fetchone()[0]
+
+    def recover_combined(self, admin):
+        """Offline only: authenticated one-commit successor and corrected backwards clock."""
+        with self.tx(recovery='combined') as c:
+            self.auth(c,'admin',admin,'admin')
+            c.execute('DELETE FROM approvals')
+            c.execute('UPDATE plans SET used=1 WHERE used=0')
+            self.log(c,'combined_recovered','')
             return c.execute('SELECT count(*) FROM effects').fetchone()[0]
 
     def execute(self,a,actor,token):
@@ -257,9 +271,39 @@ class ProtectedGate(Gate):
             c.execute('DELETE FROM approvals WHERE plan=?',(row[0],))
             self.log(c,'closed_'+reason,row[0])
 
+    def count_junk(self, kind):
+        """Constant-space aggregate; no disk write or individual audit entry per junk request."""
+        if kind not in self.JUNK_KINDS: raise ValueError('unknown counter')
+        with self.junk_lock:
+            self.junk_pending[kind] = min(2**63-1, self.junk_pending[kind]+1)
+
+    def flush_junk(self):
+        """At most one counter transaction per monotonic second; never evicts audit evidence."""
+        with self.junk_lock:
+            now=time.monotonic()
+            if self.junk_last_flush is not None and now-self.junk_last_flush<1: return
+            pending=self.junk_pending.copy()
+            if not any(pending.values()): return
+            self.junk_pending={kind:0 for kind in self.JUNK_KINDS}
+            self.junk_last_flush=now
+        try:
+            with self.tx() as c:
+                for kind,count in pending.items():
+                    if count:
+                        c.execute('INSERT INTO junk_counts VALUES (?,?) ON CONFLICT(kind) DO UPDATE SET count=min(9223372036854775807,count+excluded.count)',(kind,count))
+        except OutcomeUncertain:
+            # Do not re-add possibly committed counts.
+            raise
+        except BaseException:
+            with self.junk_lock:
+                for kind,count in pending.items():
+                    self.junk_pending[kind]=min(2**63-1,self.junk_pending[kind]+count)
+            raise
+
     def maintenance(self, retention):
         """Record overdue escalations once. Remove aged audit events only; keep replay tombstones."""
         if not 60 <= retention <= 31536000: raise Denied('invalid retention')
+        self.flush_junk()
         with self.tx() as c:
             now=self.clock()
             for oid,key in c.execute('SELECT id,plan FROM objections WHERE closed=0 AND deadline<=?',(now,)).fetchall():
@@ -274,9 +318,13 @@ class ProtectedGate(Gate):
             self.auth(c,actor,token,'lead')
             return [r[0] for r in c.execute('SELECT e.oid FROM escalations e JOIN objections o ON e.oid=o.id JOIN plans p ON o.plan=p.id JOIN backups b ON b.plan=p.id WHERE (p.lead=? OR b.actor=?) AND o.closed=0',(actor,actor))]
 
-    def record_denial(self, request, authenticated=None):
+    def record_denial(self, request, authenticated=None, plane="request"):
         op=request.get('op'); args=request.get('args')
         if not isinstance(args,dict): args={}
+        if not isinstance(op,str) or op not in OPERATIONS or not isinstance(request.get('args'),dict):
+            self.count_junk('malformed_control' if plane=='control' else 'malformed_request'); return
+        if plane=='request' and op not in ('execute','object'):
+            self.count_junk('malformed_request'); return
         claimed='admin' if 'admin' in args else args.get('actor')
         key=''
         obj=args.get('a')
@@ -285,8 +333,10 @@ class ProtectedGate(Gate):
         try:
             with self.tx() as c:
                 known=isinstance(claimed,str) and c.execute('SELECT 1 FROM actors WHERE id=?',(claimed,)).fetchone()
-                self.log(c,op if op in OPERATIONS else 'unknown',key,'denied',authenticated or 'unauthenticated',claimed if known and claimed!=authenticated else None)
-                c.execute("DELETE FROM audit WHERE outcome='denied' AND seq NOT IN (SELECT seq FROM audit WHERE outcome='denied' ORDER BY seq DESC LIMIT ?)",(self.denial_limit,))
+                self.log(c,op,key,'denied',authenticated or 'unauthenticated',claimed if known and claimed!=authenticated else None,plane=plane)
+                # Unauthenticated requester refusals have their own bounded partition.
+                # Authenticated and control-plane evidence follows time retention only.
+                c.execute("DELETE FROM audit WHERE outcome='denied' AND plane='request' AND actor='unauthenticated' AND seq NOT IN (SELECT seq FROM audit WHERE outcome='denied' AND plane='request' AND actor='unauthenticated' ORDER BY seq DESC LIMIT ?)",(self.denial_limit,))
         except Denied: pass
 
     def dispatch(self, plane, request):
@@ -294,7 +344,7 @@ class ProtectedGate(Gate):
         try: return self.route(plane,request)
         except OutcomeUncertain: raise
         except (Denied,ValueError,TypeError,KeyError,AttributeError):
-            self.record_denial(request,getattr(self.local,'actor',None))
+            self.record_denial(request,getattr(self.local,'actor',None),plane)
             raise
 
     def route(self, plane, request):
@@ -314,9 +364,11 @@ class Handler(socketserver.StreamRequestHandler):
     def handle(self):
         self.request.settimeout(3)
         routed=False
+        junk_kind='malformed_control' if self.server.plane=='control' else 'malformed_request'
         try:
             _,uid,_=struct.unpack('3i',self.request.getsockopt(socket.SOL_SOCKET,socket.SO_PEERCRED,12))
-            if uid!=self.server.peer_uid: raise Denied('peer uid denied')
+            if uid!=self.server.peer_uid:
+                junk_kind='wrong_peer'; raise Denied('peer uid denied')
             raw=self.rfile.readline(LIMIT+1)
             if len(raw)>LIMIT or not raw.endswith(b'\n'): raise Denied('invalid request')
             request=json.loads(raw)
@@ -328,7 +380,7 @@ class Handler(socketserver.StreamRequestHandler):
             reply={'ok':False,'error':'outcome_uncertain','retry':False}
         except (Denied,ValueError,TypeError,KeyError,OSError,AttributeError):
             if not routed:
-                self.server.gate.record_denial({'op':'invalid_request'})
+                self.server.gate.count_junk(junk_kind)
             reply={'ok':False,'error':'denied'}
         try: self.wfile.write(json.dumps(reply).encode()+b'\n')
         except OSError: pass
@@ -383,8 +435,10 @@ def serve(args):
         token=getpass.getpass('Administrator token: ')
         if args.recover=='clock':
             gate.recover_clock(token); print('Clock recovered; pending plans voided')
-        else:
+        elif args.recover=='checkpoint':
             print('Checkpoint reconciled; recorded effects:',gate.reconcile_checkpoint(token))
+        else:
+            print('Clock and checkpoint recovered; recorded effects:',gate.recover_combined(token))
         return
     bootstrap=read_secret(private/'bootstrap.token').decode().strip() if args.bootstrap else None
     gate=ProtectedGate(str(private/'gate.db'),key,bootstrap)
@@ -403,7 +457,7 @@ def serve(args):
         time.sleep(1)
 
 def main():
-    p=argparse.ArgumentParser(); p.add_argument('--private',required=True); p.add_argument('--sockets',required=True); p.add_argument('--requester-uid',required=True,type=int); p.add_argument('--retention',type=int,default=86400); p.add_argument('--bootstrap',action='store_true'); p.add_argument('--recover',choices=('clock','checkpoint'))
+    p=argparse.ArgumentParser(); p.add_argument('--private',required=True); p.add_argument('--sockets',required=True); p.add_argument('--requester-uid',required=True,type=int); p.add_argument('--retention',type=int,default=86400); p.add_argument('--bootstrap',action='store_true'); p.add_argument('--recover',choices=('clock','checkpoint','combined'))
     serve(p.parse_args())
 
 if __name__=='__main__': main()
