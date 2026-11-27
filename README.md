@@ -146,7 +146,7 @@ The framework is voluntary and intended for research. The engine’s component c
 - [Situational review](SITUATIONAL-REVIEW.md) and [ethical conflict resolution](protocols/ETHICAL-CONFLICT-RESOLUTION.md).
 - [Emergency and humanitarian protocol](protocols/EMERGENCY-HUMANITARIAN.md).
 - [Technical enforcement model](protocols/TECHNICAL-ENFORCEMENT.md) — 12 design controls.
-- [Ethical stress-test suite](research/ETHICAL-STRESS-TESTS.md) — 39 scenarios.
+- [Ethical stress-test suite](research/ETHICAL-STRESS-TESTS.md#cases) — 39 baseline cases, with the protections and rules each case exercises. See also the [exercise-alert supplement](research/ETHICAL-STRESS-TESTS.md#exercise-alert).
 - [Governance](GOVERNANCE.md), [contributing](CONTRIBUTING.md), [licence](LICENSE.md).
 
 The Clara Accord Engine (CAE) is intended as model-independent middleware for independently enforced permissions, with Project Clara as a possible research platform. Personal assistants, education, business and robotics are potential applications; healthcare, humanitarian and critical infrastructure uses require specialised safeguards and independent evidence. No live high-risk use is authorised.
