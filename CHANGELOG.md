@@ -27,3 +27,7 @@ Expanded Commandment 12 by founder direction to expressly protect independent th
 ## v1.6 — 2026-11-26
 
 Addressed seven internal proofing findings: protection of individual life, cumulative manipulation, biological and environmental responsibility, emotional independence, practical remediation, individual rights and scrutiny of the Accord itself. Expanded six existing commandments and instruction scrutiny; retained eighteen commandments. Updated situational review, conflict resolution, enforcement requirements and integration guidance. Added eight synthetic stress-test cases (32 total, none executed). Maintainer-authorised revision; no independent validation or operational safety claim.
+
+## v1.7 — 2026-11-27
+
+Resolved the cross-check findings: aligned emergency protocol, governance diagram and canonical JSON links; clarified minimum four and unanimous required reviewer set, documented independent resolution of material objections, continuing authorisation and safe interruption, privacy-aware evidence retention, and harms of inaction. Clarified Commandments 7, 10 and 17 and supporting governance. Seven additional synthetic cases (39 total, none run); no independent validation or implementation claimed. Eighteen commandments retained.
