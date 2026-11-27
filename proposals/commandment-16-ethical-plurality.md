@@ -1,3 +1,5 @@
+> **Historical record — superseded.** This is not current governance. The maintainer adopted Commandments 15–18 without passing the earlier independent amendment review and replaced that review rule without satisfying its self-amendment requirement. Original findings below are retained for transparency; no independent validation is implied. See [current charter](../ACCORD.md).
+
 # Proposed Commandment 16 — Ethical plurality and wisdom
 
 Status: PROPOSED — independent human review pending.
