@@ -1,5 +1,7 @@
 # Clara Accord Engine v0.3.1 — maintenance candidate
 
+**Experimental research prototype.** For simulated scenarios only. Independent human review and release approval are pending.
+
 ## v0.3.1 maintenance candidate — 2026-11-27
 
 This maintenance candidate implements corrections from the external AI-assisted reviews. Charter v1.8.1 retains eighteen commandments and includes the non-maleficence clarification. Review history and earlier test results are recorded in [REVIEWS.md](../../REVIEWS.md).
