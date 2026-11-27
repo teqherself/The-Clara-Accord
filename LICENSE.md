@@ -9,3 +9,5 @@ Suggested attribution: The Clara Accord, https://github.com/teqherself/The-Clara
 The full controlling licence text is available at https://creativecommons.org/licenses/by/4.0/legalcode.en .
 
 Licence summary: https://creativecommons.org/licenses/by/4.0/
+
+Software in `engine/` is separately licensed under the [MIT License](engine/LICENSE). The charter and accompanying non-software documentation remain CC BY 4.0.
