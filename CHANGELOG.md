@@ -35,3 +35,7 @@ Resolved the cross-check findings: aligned emergency protocol, governance diagra
 ## v1.8 — 2026-11-27
 
 Consolidated following external AI-assisted critique: clarified lawful therapeutic care, ethical precedence, material objection ownership and escalation; disclosed adoption history, shortened README, updated licence attribution and made the integration prompt self-contained. No independent human validation claimed.
+
+### Engine prototype v0.1
+
+Published a simulated in-memory Python policy gate and 13 locally passing pytest checks. No live actions, real identity verification or full ethical scenario evaluations. Code under engine/ is MIT; charter documentation remains CC BY 4.0.
