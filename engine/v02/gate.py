@@ -3,8 +3,9 @@
 import hashlib, hmac, json, secrets, sqlite3, time
 from contextlib import contextmanager
 from dataclasses import dataclass
+from types import MappingProxyType
 
-LEVELS = {'sim.read': 0, 'sim.edit': 1, 'sim.private_disclosure': 2, 'sim.high_risk': 4}
+LEVELS = MappingProxyType({'sim.read': 0, 'sim.edit': 1, 'sim.private_disclosure': 2, 'sim.high_risk': 4})
 class Denied(Exception): pass
 @dataclass(frozen=True)
 class Action:
@@ -21,7 +22,7 @@ class Gate:
         with self.tx() as c:
             for sql in (
                 'CREATE TABLE IF NOT EXISTS actors(id TEXT PRIMARY KEY, secret TEXT NOT NULL, role TEXT NOT NULL)',
-                'CREATE TABLE IF NOT EXISTS plans(id TEXT PRIMARY KEY, reviewers TEXT, expiry REAL, used INTEGER DEFAULT 0)',
+                'CREATE TABLE IF NOT EXISTS plans(id TEXT PRIMARY KEY, reviewers TEXT, requester TEXT, lead TEXT, expiry REAL, used INTEGER DEFAULT 0)',
                 'CREATE TABLE IF NOT EXISTS approvals(plan TEXT, actor TEXT, PRIMARY KEY(plan,actor))',
                 'CREATE TABLE IF NOT EXISTS objections(id TEXT PRIMARY KEY, plan TEXT, actor TEXT, deadline REAL, closed INTEGER DEFAULT 0)',
                 'CREATE TABLE IF NOT EXISTS effects(plan TEXT PRIMARY KEY)',
@@ -53,14 +54,16 @@ class Gate:
         with self.tx() as c:
             self.auth(c,'admin',admin,'admin'); c.execute('INSERT INTO actors VALUES (?,?,?)',(actor,self.hash(token),role))
         return token
-    def register(self,admin,a,reviewers,ttl=60):
+    def register(self,admin,a,reviewers,requester,lead,ttl=60):
         people=sorted(set(reviewers)); key=a.digest()
         if a.kind not in LEVELS or len(people)<LEVELS[a.kind] or not 0<ttl<=3600: raise Denied('invalid plan')
         with self.tx() as c:
             self.auth(c,'admin',admin,'admin')
             for p in people:
                 if c.execute('SELECT role FROM actors WHERE id=?',(p,)).fetchone()!=('reviewer',): raise Denied('invalid reviewer')
-            c.execute('INSERT INTO plans(id,reviewers,expiry) VALUES (?,?,?)',(key,json.dumps(people),self.clock()+ttl)); self.log(c,'registered',key)
+            for actor,role in ((requester,'requester'),(lead,'lead')):
+                if c.execute('SELECT role FROM actors WHERE id=?',(actor,)).fetchone()!=(role,): raise Denied('invalid assigned role')
+            c.execute('INSERT INTO plans(id,reviewers,requester,lead,expiry) VALUES (?,?,?,?,?)',(key,json.dumps(people),requester,lead,self.clock()+ttl)); self.log(c,'registered',key)
     def plan(self,c,key):
         row=c.execute('SELECT reviewers,expiry,used FROM plans WHERE id=?',(key,)).fetchone()
         if not row or row[1]<=self.clock() or row[2]: raise Denied('missing, expired or consumed plan')
@@ -87,6 +90,7 @@ class Gate:
         with self.tx() as c:
             self.auth(c,actor,token,'lead'); row=c.execute('SELECT plan,actor,closed FROM objections WHERE id=?',(oid,)).fetchone()
             if not row or row[1]==actor or row[2]: raise Denied('invalid closure')
+            if c.execute('SELECT lead FROM plans WHERE id=?',(row[0],)).fetchone()!=(actor,): raise Denied('not assigned lead')
             c.execute('UPDATE objections SET closed=1 WHERE id=?',(oid,)); c.execute('DELETE FROM approvals WHERE plan=?',(row[0],)); self.log(c,'closed_'+reason,row[0])
     def overdue(self,actor,token):
         with self.tx() as c:
@@ -97,6 +101,7 @@ class Gate:
             self.auth(c,actor,token,'requester')
             if a.kind not in LEVELS: raise Denied('default deny')
             required=self.plan(c,key)
+            if c.execute('SELECT requester FROM plans WHERE id=?',(key,)).fetchone()!=(actor,): raise Denied('not assigned requester')
             if c.execute('SELECT 1 FROM objections WHERE plan=? AND closed=0',(key,)).fetchone(): raise Denied('unresolved objection')
             if {r[0] for r in c.execute('SELECT actor FROM approvals WHERE plan=?',(key,))}!=required: raise Denied('missing approvals')
             c.execute('INSERT INTO effects VALUES (?)',(key,)); c.execute('UPDATE plans SET used=1 WHERE id=?',(key,)); self.log(c,'executed',key)
