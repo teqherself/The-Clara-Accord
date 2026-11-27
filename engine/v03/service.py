@@ -25,6 +25,9 @@ from gate import Gate, Action, Denied, LEVELS
 TABLES = ('actors', 'plans', 'approvals', 'objections', 'effects', 'audit', 'disabled', 'escalations', 'resolutions')
 LIMIT = 16384
 
+class OutcomeUncertain(Denied):
+    """Commit completed but checkpoint confirmation failed; do not retry."""
+
 class ProtectedGate(Gate):
     """Trusted service only. HMAC state seal and a separately stored checkpoint."""
     def __init__(self, path, key, admin_token=None, clock=time.time):
@@ -88,7 +91,8 @@ class ProtectedGate(Gate):
             c.execute('INSERT OR REPLACE INTO integrity VALUES (1,?,?)', (now,mac))
             c.commit()
             # A crash after commit but before checkpoint replacement fails closed on restart.
-            self.checkpoint(mac)
+            try: self.checkpoint(mac)
+            except OSError as exc: raise OutcomeUncertain('commit completed; checkpoint unconfirmed') from exc
         except (sqlite3.Error,OSError,UnicodeError) as exc:
             if c: c.rollback()
             raise Denied('storage or integrity failure') from exc
@@ -184,6 +188,8 @@ class Handler(socketserver.StreamRequestHandler):
             if not isinstance(request,dict): raise Denied('invalid request')
             result=self.server.gate.dispatch(self.server.plane,request)
             reply={'ok':True,'result':result}
+        except OutcomeUncertain:
+            reply={'ok':False,'error':'outcome_uncertain','retry':False}
         except (Denied,ValueError,TypeError,KeyError,OSError,AttributeError):
             reply={'ok':False,'error':'denied'}
         try: self.wfile.write(json.dumps(reply).encode()+b'\n')
