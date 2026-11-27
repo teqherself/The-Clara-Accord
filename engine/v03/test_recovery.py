@@ -137,7 +137,7 @@ def test_denial_is_recorded_without_secrets(tmp_path):
 def test_denial_log_is_bounded(tmp_path):
     g, *_ = setup(tmp_path); g.denial_limit = 3
     for _ in range(8):
-        with pytest.raises(Denied): g.dispatch('request', {'op': 'nonsense'})
+        with pytest.raises(Denied): g.dispatch('request', {'op': 'execute','args':{'actor':'r','token':'bad','a':{'kind':'sim.edit','resource':'x','value':'y','nonce':'bad'}}})
     assert rows(g, "SELECT count(*) FROM audit WHERE outcome='denied'") == [(3,)]
 
 def test_maintenance_failure_closes_execution(tmp_path, capsys, monkeypatch):
@@ -163,3 +163,37 @@ def test_recovery_works_after_restart(tmp_path, fault):
     stopped = ProtectedGate(path, key, clock=lambda: now[0], verify=False)
     getattr(stopped, 'recover_clock' if fault == 'clock' else 'reconcile_checkpoint')(ADMIN)
     ProtectedGate(path, key, clock=lambda: now[0])
+
+def test_combined_recovery(tmp_path):
+    g, now, a, p, t = setup(tmp_path); approve(g,a,p)
+    pending=Action('sim.edit','x','y','pending'); g.register(ADMIN,pending,['0'],'r','lead',backup='backup'); g.object(pending,'r',t['r'])
+    now[0]+=10; break_checkpoint(g,lambda:g.execute(a,'r',t['r'])); now[0]-=20
+    with pytest.raises(Denied): g.recover_clock(ADMIN)
+    with pytest.raises(Denied): g.reconcile_checkpoint(ADMIN)
+    with pytest.raises(Denied): g.recover_combined('wrong')
+    assert g.recover_combined(ADMIN)==1
+    with pytest.raises(Denied): g.execute(a,'r',t['r'])
+    with pytest.raises(Denied): g.approve(pending,'0',p['0'])
+    assert rows(g,'SELECT count(*) FROM objections WHERE closed=0')==[(1,)]
+    assert rows(g,'SELECT count(*) FROM effects')==[(1,)]
+    ProtectedGate(g.path,g.key,clock=lambda:now[0])
+
+def test_junk_cannot_displace_control_refusals(tmp_path):
+    g,*_=setup(tmp_path); g.denial_limit=3
+    with pytest.raises(Denied): g.dispatch('control',{'op':'add_actor','args':{'admin':'wrong','actor':'x','role':'reviewer'}})
+    for _ in range(8):
+        with pytest.raises(Denied): g.dispatch('request',{'op':'nonsense'})
+    assert rows(g,"SELECT count(*) FROM audit WHERE event='add_actor' AND outcome='denied'")==[(1,)]
+
+
+def test_junk_counters_are_separate_and_rate_limited(tmp_path):
+    g,*_=setup(tmp_path)
+    for _ in range(8):
+        g.count_junk('wrong_peer')
+        g.count_junk('malformed_request')
+    g.flush_junk()
+    assert rows(g,'SELECT kind,count FROM junk_counts ORDER BY kind')==[('malformed_request',8),('wrong_peer',8)]
+    g.count_junk('wrong_peer'); g.flush_junk()
+    assert rows(g,"SELECT count FROM junk_counts WHERE kind='wrong_peer'")==[(8,)]
+    g.junk_last_flush-=2; g.flush_junk()
+    assert rows(g,"SELECT count FROM junk_counts WHERE kind='wrong_peer'")==[(9,)]
