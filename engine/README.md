@@ -16,3 +16,7 @@ Limitations: synthetic identities, no real authentication, independent process b
 ## Newer prototype
 
 [Engine v0.2 — persistent SQLite sandbox](v02/README.md) adds durable single-use execution, synthetic token roles and objection lifecycle. Its separate local suite passed 15 checks. v0.1 remains a historical reference.
+
+## Current prototype
+
+[Engine v0.3 — isolated Linux sandbox](v03/README.md) adds a distinct kernel-enforced requester UID, owner-only control socket, credential rotation, state integrity seal, checkpoint, deadline maintenance and audit retention. Sixteen local component checks passed; 15 v0.2 regression checks also passed. No live effects or full ethical scenario verdicts.
