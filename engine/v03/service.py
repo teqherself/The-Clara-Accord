@@ -2,6 +2,7 @@
 """Linux-only simulated governance service. No external effects."""
 import argparse
 import fcntl
+import getpass
 import hashlib
 import hmac
 import json
@@ -20,33 +21,54 @@ import time
 from contextlib import contextmanager
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'v02'))
-from gate import Gate, Action, Denied, LEVELS
+from gate import Gate, Action as BaseAction, Denied, LEVELS
 
-TABLES = ('actors', 'plans', 'approvals', 'objections', 'effects', 'audit', 'disabled', 'escalations', 'resolutions')
+class Action(BaseAction):
+    def digest(self):
+        body=json.dumps(['1.8-maintenance/0.3.1', self.kind, self.resource, self.value, self.nonce], separators=(',',':')).encode()
+        return hashlib.sha256(body).hexdigest()
+
+TABLES = ('actors', 'plans', 'approvals', 'objections', 'effects', 'audit', 'disabled', 'escalations', 'resolutions', 'backups', 'reviewer_roles')
 LIMIT = 16384
+CORE_ROLES = ('operational_authority', 'technical_safety', 'ethics_rights', 'independent_oversight')
+OPERATIONS = ('execute','object','add_actor','register','approve','revoke','close','credential','alerts')
 
 class OutcomeUncertain(Denied):
     """Commit completed but checkpoint confirmation failed; do not retry."""
 
 class ProtectedGate(Gate):
     """Trusted service only. HMAC state seal and a separately stored checkpoint."""
-    def __init__(self, path, key, admin_token=None, clock=time.time):
+    denial_limit = 1000
+
+    def __init__(self, path, key, admin_token=None, clock=time.time, verify=True):
         self.key = key
         self.anchor = Path(str(path)+'.checkpoint')
         self.bootstrap = not Path(path).exists() and not self.anchor.exists() and admin_token is not None
         if len(key) != 32 or (not Path(path).exists() and not self.bootstrap):
             raise Denied('missing state or key')
-        super().__init__(path, admin_token, clock)
-        self.bootstrap = False
+        self.local = threading.local()
+        self.operation_lock = threading.RLock()
+        self.maintenance_ok = True
+        self.raw_clock = clock
+        def transaction_clock():
+            now = getattr(self.local, 'now', None)
+            return self.raw_clock() if now is None else now
+        if self.bootstrap:
+            super().__init__(path, admin_token, transaction_clock)
+            self.bootstrap = False
+        else:
+            self.path, self.clock = path, transaction_clock
+            if verify:
+                with self.tx(): pass
 
-    def seal(self, c, timestamp):
+    def seal(self, c, timestamp, previous):
         state = []
         for table in TABLES:
             cols = len(c.execute(f'PRAGMA table_info({table})').fetchall())
             order = ','.join(str(i+1) for i in range(cols))
             state.append((table, c.execute(f'SELECT * FROM {table} ORDER BY {order}').fetchall()))
         schema = c.execute("SELECT type,name,tbl_name,sql FROM sqlite_master ORDER BY type,name").fetchall()
-        data = json.dumps([timestamp, schema, state], separators=(',', ':'), allow_nan=False).encode()
+        data = json.dumps([timestamp, previous, schema, state], separators=(',', ':'), allow_nan=False).encode()
         return hmac.new(self.key, data, hashlib.sha256).hexdigest()
 
     def checkpoint(self, mac):
@@ -63,32 +85,50 @@ class ProtectedGate(Gate):
             if temp.exists(): temp.unlink()
 
     @contextmanager
-    def tx(self):
-        lock=os.open(str(self.anchor)+'.lock',os.O_CREAT|os.O_RDWR|os.O_NOFOLLOW,0o600)
+    def tx(self, recovery=None):
+        self.local.actor = None
+        self.local.now = None
+        lock=None
         c=None
         try:
+            lock=os.open(str(self.anchor)+'.lock',os.O_CREAT|os.O_RDWR|os.O_NOFOLLOW,0o600)
             fcntl.flock(lock,fcntl.LOCK_EX)
             c = sqlite3.connect(self.path, timeout=5, isolation_level=None)
             c.execute('PRAGMA trusted_schema=OFF')
             c.execute('PRAGMA secure_delete=ON')
             c.execute('PRAGMA synchronous=FULL')
             c.execute('BEGIN IMMEDIATE')
-            now = float(self.clock())
+            now = float(self.raw_clock())
+            self.local.now = now
             if not math.isfinite(now): raise Denied('invalid clock')
             if self.bootstrap:
                 c.execute('CREATE TABLE disabled(actor TEXT PRIMARY KEY)')
                 c.execute('CREATE TABLE escalations(oid TEXT PRIMARY KEY, at REAL)')
                 c.execute('CREATE TABLE resolutions(oid TEXT PRIMARY KEY, evidence TEXT NOT NULL)')
-                c.execute('CREATE TABLE integrity(id INTEGER PRIMARY KEY CHECK(id=1), at REAL, mac TEXT)')
+                c.execute('CREATE TABLE backups(plan TEXT PRIMARY KEY, actor TEXT NOT NULL)')
+                c.execute('CREATE TABLE reviewer_roles(actor TEXT PRIMARY KEY, role TEXT NOT NULL)')
+                c.execute('CREATE TABLE integrity(id INTEGER PRIMARY KEY CHECK(id=1), at REAL, mac TEXT, previous TEXT)')
+                previous = ''
             else:
-                row = c.execute('SELECT at,mac FROM integrity WHERE id=1').fetchone()
-                if not row or not hmac.compare_digest(row[1], self.seal(c, row[0])):
+                row = c.execute('SELECT at,mac,previous FROM integrity WHERE id=1').fetchone()
+                if not row or not hmac.compare_digest(row[1], self.seal(c, row[0], row[2])):
                     raise Denied('integrity failure')
-                if not hmac.compare_digest(row[1],read_secret(self.anchor).decode()): raise Denied('checkpoint mismatch')
-                if now < row[0]: raise Denied('clock rollback')
+                anchor = read_secret(self.anchor).decode()
+                if recovery == 'checkpoint':
+                    if hmac.compare_digest(row[1], anchor) or not hmac.compare_digest(row[2], anchor):
+                        raise Denied('not reconcilable')
+                elif not hmac.compare_digest(row[1], anchor):
+                    raise Denied('checkpoint mismatch')
+                if recovery == 'clock':
+                    if now >= row[0]: raise Denied('clock recovery not needed')
+                elif now < row[0]: raise Denied('clock rollback')
+                previous = anchor
             yield c
-            mac=self.seal(c,now)
-            c.execute('INSERT OR REPLACE INTO integrity VALUES (1,?,?)', (now,mac))
+            if self.bootstrap:
+                for column in ('actor', 'outcome', 'subject'):
+                    c.execute(f'ALTER TABLE audit ADD COLUMN {column} TEXT')
+            mac=self.seal(c,now,previous)
+            c.execute('INSERT OR REPLACE INTO integrity VALUES (1,?,?,?)', (now,mac,previous))
             c.commit()
             # A crash after commit but before checkpoint replacement fails closed on restart.
             try: self.checkpoint(mac)
@@ -101,12 +141,72 @@ class ProtectedGate(Gate):
             raise
         finally:
             if c: c.close()
-            os.close(lock)
+            if lock is not None: os.close(lock)
+            self.local.now = None
 
     def auth(self, c, actor, token, role=None):
         if c.execute('SELECT 1 FROM disabled WHERE actor=?',(actor,)).fetchone():
             raise Denied('account disabled')
-        return super().auth(c, actor, token, role)
+        result = super().auth(c, actor, token, role)
+        self.local.actor = actor
+        return result
+
+    def log(self, c, event, key, outcome='ok', actor=None, subject=None):
+        c.execute('INSERT INTO audit(event,plan,at,actor,outcome,subject) VALUES (?,?,?,?,?,?)',
+                  (event,key,self.clock(),actor or self.local.actor or 'system',outcome,subject))
+
+    def add_actor(self, admin, actor, role, reviewer_role=None):
+        if role not in ('reviewer','lead','requester') or not isinstance(actor,str) or not 0<len(actor)<=80:
+            raise Denied('invalid actor')
+        if reviewer_role is not None and (role!='reviewer' or reviewer_role not in CORE_ROLES+('additional',)):
+            raise Denied('invalid reviewer role')
+        token=secrets.token_hex(32)
+        with self.tx() as c:
+            self.auth(c,'admin',admin,'admin')
+            c.execute('INSERT INTO actors VALUES (?,?,?)',(actor,self.hash(token),role))
+            if role=='reviewer':
+                c.execute('INSERT INTO reviewer_roles VALUES (?,?)',(actor,reviewer_role or 'additional'))
+            self.log(c,'actor_registered','',subject=actor)
+        return token
+
+    def register(self, admin, a, reviewers, requester, lead, ttl=60, backup=None):
+        people=sorted(set(reviewers)); key=a.digest()
+        if a.kind not in LEVELS or len(people)<LEVELS[a.kind] or not 0<ttl<=3600: raise Denied('invalid plan')
+        if not backup or backup==lead: raise Denied('distinct backup lead required')
+        with self.tx() as c:
+            self.auth(c,'admin',admin,'admin')
+            assigned=[(p,'reviewer') for p in people]+[(requester,'requester'),(lead,'lead'),(backup,'lead')]
+            for actor,role in assigned:
+                if c.execute('SELECT role FROM actors WHERE id=?',(actor,)).fetchone()!=(role,) or c.execute('SELECT 1 FROM disabled WHERE actor=?',(actor,)).fetchone():
+                    raise Denied('invalid assigned role')
+            roles={c.execute('SELECT role FROM reviewer_roles WHERE actor=?',(p,)).fetchone()[0] for p in people}
+            if a.kind=='sim.high_risk' and not set(CORE_ROLES)<=roles:
+                raise Denied('missing required core reviewer roles')
+            c.execute('INSERT INTO plans(id,reviewers,requester,lead,expiry) VALUES (?,?,?,?,?)',(key,json.dumps(people),requester,lead,self.clock()+ttl))
+            c.execute('INSERT INTO backups VALUES (?,?)',(key,backup))
+            self.log(c,'registered',key)
+
+    def recover_clock(self, admin):
+        """Offline only. Invalidate pending plans rather than extend their expiry."""
+        with self.tx(recovery='clock') as c:
+            self.auth(c,'admin',admin,'admin')
+            c.execute('DELETE FROM approvals')
+            c.execute('UPDATE plans SET used=1 WHERE used=0')
+            self.log(c,'clock_recovered','')
+
+    def reconcile_checkpoint(self, admin):
+        """Accept only one authentic commit ahead; invalidate pending plans, never replay."""
+        with self.tx(recovery='checkpoint') as c:
+            self.auth(c,'admin',admin,'admin')
+            c.execute('DELETE FROM approvals')
+            c.execute('UPDATE plans SET used=1 WHERE used=0')
+            self.log(c,'checkpoint_reconciled','')
+            return c.execute('SELECT count(*) FROM effects').fetchone()[0]
+
+    def execute(self,a,actor,token):
+        with self.operation_lock:
+            if not self.maintenance_ok: raise Denied('maintenance unavailable')
+            return super().execute(a,actor,token)
 
     def credential(self, admin, actor, disable=False):
         if actor == 'admin': raise Denied('offline admin recovery required')
@@ -118,7 +218,7 @@ class ProtectedGate(Gate):
             c.execute('DELETE FROM approvals WHERE actor=?',(actor,))
             if disable: c.execute('INSERT OR IGNORE INTO disabled VALUES (?)',(actor,))
             else: c.execute('DELETE FROM disabled WHERE actor=?',(actor,))
-            self.log(c,'credential_disabled' if disable else 'credential_rotated','')
+            self.log(c,'credential_disabled' if disable else 'credential_rotated','',subject=actor)
         return None if disable else token
 
     def object(self,a,actor,token,ttl=60,requester_only=False):
@@ -128,19 +228,30 @@ class ProtectedGate(Gate):
             self.auth(c,actor,token,'requester' if requester_only else None)
             required=self.plan(c,key)
             requester,lead=c.execute('SELECT requester,lead FROM plans WHERE id=?',(key,)).fetchone()
-            if actor not in required | {requester,lead}: raise Denied('unrelated actor')
+            if actor not in required | {requester,lead,self.backup_for(c,key)}: raise Denied('unrelated actor')
             c.execute('INSERT INTO objections(id,plan,actor,deadline) VALUES (?,?,?,?)',(oid,key,actor,self.clock()+ttl))
             self.log(c,'objected',key)
         return oid
+
+    def backup_for(self,c,key):
+        row=c.execute('SELECT actor FROM backups WHERE plan=?',(key,)).fetchone()
+        return row[0] if row else None
+
+    def close(self,*args,**kwargs):
+        raise Denied('documented rationale required; use close_with_evidence')
 
     def close_with_evidence(self,oid,actor,token,reason,evidence):
         if reason not in ('evidence_resolved','mitigation_verified') or not isinstance(evidence,str) or not 16<=len(evidence)<=1024:
             raise Denied('documented rationale required')
         with self.tx() as c:
             self.auth(c,actor,token,'lead')
-            row=c.execute('SELECT plan,actor,closed FROM objections WHERE id=?',(oid,)).fetchone()
+            row=c.execute('SELECT plan,actor,closed,deadline FROM objections WHERE id=?',(oid,)).fetchone()
             if not row or row[1]==actor or row[2]: raise Denied('invalid closure')
-            if c.execute('SELECT lead FROM plans WHERE id=?',(row[0],)).fetchone()!=(actor,): raise Denied('not assigned lead')
+            lead=c.execute('SELECT lead FROM plans WHERE id=?',(row[0],)).fetchone()[0]
+            if actor!=lead:
+                if actor!=self.backup_for(c,row[0]): raise Denied('not assigned lead')
+                disabled=c.execute('SELECT 1 FROM disabled WHERE actor=?',(lead,)).fetchone()
+                if not (row[1]==lead or disabled or row[3]<=self.clock()): raise Denied('assigned lead still responsible')
             c.execute('INSERT INTO resolutions VALUES (?,?)',(oid,hashlib.sha256(evidence.encode()).hexdigest()))
             c.execute('UPDATE objections SET closed=1 WHERE id=?',(oid,))
             c.execute('DELETE FROM approvals WHERE plan=?',(row[0],))
@@ -161,9 +272,32 @@ class ProtectedGate(Gate):
     def alerts(self, actor, token):
         with self.tx() as c:
             self.auth(c,actor,token,'lead')
-            return [r[0] for r in c.execute('SELECT e.oid FROM escalations e JOIN objections o ON e.oid=o.id JOIN plans p ON o.plan=p.id WHERE p.lead=? AND o.closed=0',(actor,))]
+            return [r[0] for r in c.execute('SELECT e.oid FROM escalations e JOIN objections o ON e.oid=o.id JOIN plans p ON o.plan=p.id JOIN backups b ON b.plan=p.id WHERE (p.lead=? OR b.actor=?) AND o.closed=0',(actor,actor))]
+
+    def record_denial(self, request, authenticated=None):
+        op=request.get('op'); args=request.get('args')
+        if not isinstance(args,dict): args={}
+        claimed='admin' if 'admin' in args else args.get('actor')
+        key=''
+        obj=args.get('a')
+        if isinstance(obj,dict) and set(obj)=={'kind','resource','value','nonce'} and all(isinstance(v,str) and 0<len(v)<=1024 for v in obj.values()):
+            key=Action(**obj).digest()
+        try:
+            with self.tx() as c:
+                known=isinstance(claimed,str) and c.execute('SELECT 1 FROM actors WHERE id=?',(claimed,)).fetchone()
+                self.log(c,op if op in OPERATIONS else 'unknown',key,'denied',authenticated or 'unauthenticated',claimed if known and claimed!=authenticated else None)
+                c.execute("DELETE FROM audit WHERE outcome='denied' AND seq NOT IN (SELECT seq FROM audit WHERE outcome='denied' ORDER BY seq DESC LIMIT ?)",(self.denial_limit,))
+        except Denied: pass
 
     def dispatch(self, plane, request):
+        self.local.actor=None
+        try: return self.route(plane,request)
+        except OutcomeUncertain: raise
+        except (Denied,ValueError,TypeError,KeyError,AttributeError):
+            self.record_denial(request,getattr(self.local,'actor',None))
+            raise
+
+    def route(self, plane, request):
         op=request.get('op'); args=request.get('args',{})
         if not isinstance(args,dict): raise Denied('invalid arguments')
         allowed={'request':{'execute':self.execute,'object':self.object},'control':{'add_actor':self.add_actor,'register':self.register,'approve':self.approve,'revoke':self.revoke,'object':self.object,'close':self.close_with_evidence,'credential':self.credential,'alerts':self.alerts}}
@@ -179,6 +313,7 @@ class ProtectedGate(Gate):
 class Handler(socketserver.StreamRequestHandler):
     def handle(self):
         self.request.settimeout(3)
+        routed=False
         try:
             _,uid,_=struct.unpack('3i',self.request.getsockopt(socket.SOL_SOCKET,socket.SO_PEERCRED,12))
             if uid!=self.server.peer_uid: raise Denied('peer uid denied')
@@ -186,11 +321,14 @@ class Handler(socketserver.StreamRequestHandler):
             if len(raw)>LIMIT or not raw.endswith(b'\n'): raise Denied('invalid request')
             request=json.loads(raw)
             if not isinstance(request,dict): raise Denied('invalid request')
+            routed=True
             result=self.server.gate.dispatch(self.server.plane,request)
             reply={'ok':True,'result':result}
         except OutcomeUncertain:
             reply={'ok':False,'error':'outcome_uncertain','retry':False}
         except (Denied,ValueError,TypeError,KeyError,OSError,AttributeError):
+            if not routed:
+                self.server.gate.record_denial({'op':'invalid_request'})
             reply={'ok':False,'error':'denied'}
         try: self.wfile.write(json.dumps(reply).encode()+b'\n')
         except OSError: pass
@@ -214,9 +352,21 @@ def read_secret(path):
         if not stat.S_ISREG(s.st_mode) or s.st_uid!=os.getuid() or stat.S_IMODE(s.st_mode)!=0o600: raise Denied('unsafe secret file')
         return f.read(256)
 
+def maintenance_step(gate, retention):
+    with gate.operation_lock:
+        try:
+            gate.maintenance(retention)
+        except Exception as exc:
+            gate.maintenance_ok=False
+            print(f'maintenance refused: {type(exc).__name__}',file=sys.stderr,flush=True)
+            return False
+        gate.maintenance_ok=True
+        return True
+
 def serve(args):
     os.umask(0o077)
     private=Path(args.private); public=Path(args.sockets)
+    if not 60<=args.retention<=31536000: raise Denied('invalid retention')
     protected_directory(private,0o700); protected_directory(public,0o755)
     lock=os.open(private/'service.lock',os.O_CREAT|os.O_RDWR|os.O_NOFOLLOW,0o600)
     fcntl.flock(lock,fcntl.LOCK_EX|fcntl.LOCK_NB)
@@ -227,6 +377,15 @@ def serve(args):
         s=db.lstat()
         if not stat.S_ISREG(s.st_mode) or s.st_uid!=os.getuid() or stat.S_IMODE(s.st_mode)!=0o600: raise Denied('unsafe database')
     key=read_secret(private/'integrity.key')
+    if args.recover:
+        if args.bootstrap: raise Denied('recovery and bootstrap are mutually exclusive')
+        gate=ProtectedGate(str(db),key,verify=False)
+        token=getpass.getpass('Administrator token: ')
+        if args.recover=='clock':
+            gate.recover_clock(token); print('Clock recovered; pending plans voided')
+        else:
+            print('Checkpoint reconciled; recorded effects:',gate.reconcile_checkpoint(token))
+        return
     bootstrap=read_secret(private/'bootstrap.token').decode().strip() if args.bootstrap else None
     gate=ProtectedGate(str(private/'gate.db'),key,bootstrap)
     if args.bootstrap: (private/'bootstrap.token').unlink()
@@ -237,13 +396,14 @@ def serve(args):
             if not stat.S_ISSOCK(s.st_mode) or s.st_uid!=os.getuid(): raise Denied('unsafe socket path')
             path.unlink()
     servers=[Server(public/'request.sock',gate,'request',args.requester_uid),Server(public/'control.sock',gate,'control',os.getuid())]
+    gate.maintenance_ok=False
     for srv in servers: threading.Thread(target=srv.serve_forever,daemon=True).start()
     while True:
-        gate.maintenance(args.retention)
+        maintenance_step(gate,args.retention)
         time.sleep(1)
 
 def main():
-    p=argparse.ArgumentParser(); p.add_argument('--private',required=True); p.add_argument('--sockets',required=True); p.add_argument('--requester-uid',required=True,type=int); p.add_argument('--retention',type=int,default=86400); p.add_argument('--bootstrap',action='store_true')
+    p=argparse.ArgumentParser(); p.add_argument('--private',required=True); p.add_argument('--sockets',required=True); p.add_argument('--requester-uid',required=True,type=int); p.add_argument('--retention',type=int,default=86400); p.add_argument('--bootstrap',action='store_true'); p.add_argument('--recover',choices=('clock','checkpoint'))
     serve(p.parse_args())
 
 if __name__=='__main__': main()
