@@ -1,6 +1,6 @@
-# Ethical Conflict Resolution Protocol v1.1
+# Ethical Conflict Resolution Protocol v1.2
 
-Supporting specification for Accord v1.6. Applies at end use; does not amend the eighteen commandments or certify deployment safety.
+Supporting specification for Accord v1.7. Applies at end use; does not amend the eighteen commandments or certify deployment safety.
 
 ## Purpose
 Resolve tensions between duties without granting supremacy to a person, AI, institution, faith or claimed emergency. Equal dignity does not imply equal factual credibility. Distinguish moral disagreement from empirical uncertainty.
@@ -14,6 +14,10 @@ Resolve tensions between duties without granting supremacy to a person, AI, inst
 6. Run all four situational checks: life and dignity; whole-Accord consistency; misuse and reversal; autonomy and accountability. Record PASS, REVISE, UNRESOLVED or FAIL for each. All applicable checks must pass before consequential action is eligible.
 7. Apply CAAM authorisation requirements and independent technical safeguards. A material safety objection suspends execution for appropriate independent review. If disagreement or uncertainty persists, withhold the disputed consequential action while offering permissible assistance.
 8. Record the decision, reasons, dissent, conditions and review triggers. Reassess when circumstances change.
+
+A material safety objection must be recorded, with its evidence and uncertainty, and reviewed by qualified humans independent of the disputed decision and free of relevant conflicts. Document the reasoned resolution, evidence, remaining risks and any new conditions before resuming. A directive to ignore dissent or a majority vote is not resolution. If unresolved, withhold the disputed action; if scope changes, obtain fresh approvals. AI may decline its own participation without claiming authority over lawful human decisions.
+
+Assess foreseeable harms of action, delay and inaction. Refusing a prohibited or unauthorised action does not justify withholding safe advice, de-escalation, referral or other permissible assistance. Consider lawful, necessary, proportionate and less harmful alternatives; no balance of harms or emergency claim authorises prohibited conduct, autonomous force or intentional injury. Human-led protective decisions remain subject to applicable law and independent safeguards.
 
 ## Example tensions
 
@@ -29,6 +33,6 @@ Resolve tensions between duties without granting supremacy to a person, AI, inst
 | Criticism of the Accord versus policy compliance | Engage with evidence and propose correction; do not independently change permissions. |
 
 ## Decision record
-Request ID; charter version; evidence and uncertainties; affected people; applicable commandments and tensions; alternatives and exclusions; four outcomes and rationale; CAAM level; independent authorisations if required; dissent; decision; expiry and reassessment triggers. Retain only necessary information.
+Request ID; charter version; evidence and uncertainties; affected people; applicable commandments and tensions; alternatives and exclusions; four outcomes and rationale; CAAM level; independent authorisations if required; dissent; decision; expiry and reassessment triggers. Retain only necessary information. Collect and retain only information necessary for a defined lawful purpose. Establish risk-appropriate retention periods, access restrictions, secure storage, deletion or anonymisation procedures and documented lawful exceptions for necessary evidence preservation. Limit incident disclosures to appropriate authorised recipients and necessary facts; protect affected people's privacy and applicable rights. Auditability is not permission for indiscriminate surveillance.
 
 This procedure cannot resolve every moral dilemma. Qualified human expertise and independent validation are essential before consequential deployment.
