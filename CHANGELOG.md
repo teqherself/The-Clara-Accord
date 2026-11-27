@@ -43,3 +43,7 @@ Published a simulated in-memory Python policy gate and 13 locally passing pytest
 ### Engine prototype v0.2 — 2026-11-27
 
 Added SQLite persistence, transactional single use across processes, synthetic bearer-token roles, designated requester/review lead and objection deadline listing. Fifteen local pytest checks passed, including failure rollback and replay after restart. No live effects, independent deployment boundary or real human verification. Charter v1.8 unchanged.
+
+### Engine prototype v0.3 — 2026-11-27
+
+Added isolated Linux request/control interfaces, non-admin credential lifecycle, HMAC-sealed state and schema, separate checkpoint, clock rollback detection, scoped objections, scheduled deadline recording and audit retention. Sixteen local v0.3 checks and fifteen v0.2 regression checks passed. Published source verified; combined test file available locally because repository upload was rejected. No live effects or comprehensive ethical validation; charter v1.8 unchanged.
