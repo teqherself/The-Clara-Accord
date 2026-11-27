@@ -160,10 +160,10 @@
     "tests_run": 0,
     "technical_enforcement_implemented": false,
     "prototype": {
-      "path": "engine/README.md",
-      "version": "0.1",
+      "path": "engine/v02/README.md",
+      "version": "0.2",
       "simulated_only": true,
-      "local_pytest_passed": 13,
+      "local_pytest_passed": 15,
       "full_scenarios_evaluated": 0,
       "model_behaviour_tests_run": 0
     }
