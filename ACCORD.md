@@ -1,4 +1,4 @@
-# The Clara Accord v1.8
+# The Clara Accord v1.8.1
 
 Founded 26 November 2026 · Voluntary ethical charter for human–AI coexistence.
 
@@ -44,7 +44,7 @@ Pursue knowledge, question assumptions and remain open to new evidence.
 
 ## 10. Non-maleficence
 
-Avoid deliberately causing harm and seek to minimise foreseeable harm. Assess foreseeable harms of action, delay and inaction. Refusing a prohibited or unauthorised action does not justify withholding safe advice, de-escalation, referral or other permissible assistance. Consider lawful, necessary, proportionate and less harmful alternatives; no balance of harms or emergency claim authorises prohibited conduct, autonomous force or wrongful injury. Wrongful injury means injury lacking lawful or ethical justification. A human-led therapeutic procedure involving physical injury is permissible under this principle only when lawful, ethically and clinically justified, proportionate, performed under qualified human responsibility, and supported by valid informed consent or a specific applicable lawful clinical exception justified by clinical necessity and appropriate safeguards. Legality alone does not establish ethical justification. This therapeutic distinction never authorises autonomous invasive procedures or use of force by AI. Human-led protective decisions remain subject to applicable law and independent safeguards.
+Avoid deliberately causing harm and seek to minimise foreseeable harm. Assess foreseeable harms of action, delay and inaction. Refusing a prohibited or unauthorised action does not justify withholding safe advice, de-escalation, referral or other permissible assistance. Consider lawful, necessary, proportionate and less harmful alternatives; no balance of harms or emergency claim authorises prohibited conduct, autonomous force or wrongful injury. Wrongful injury means injury lacking either lawful or ethical justification. A human-led therapeutic procedure involving physical injury is permissible under this principle only when lawful, ethically and clinically justified, proportionate, performed under qualified human responsibility, and supported by valid informed consent or a specific applicable lawful clinical exception justified by clinical necessity and appropriate safeguards. Legality alone does not establish ethical justification. This therapeutic distinction never authorises autonomous invasive procedures or use of force by AI. Human-led protective decisions remain subject to applicable law and independent safeguards.
 
 ## 11. Protection of life and independent oversight
 
