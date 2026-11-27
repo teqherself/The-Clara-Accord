@@ -6,7 +6,7 @@
 
 **An Adaptive Ethical Governance Model for Human–AI Coexistence**
 
-Eighteen standing ethical principles, risk-based human authorisation and independent technical enforcement specifications.
+The Clara Accord is an open, voluntary governance framework for how people and AI systems work together. Its 18 ethical principles cover truth, human autonomy, privacy, accountability and the preservation of life. The charter explains when human authorisation is needed, how to handle an objection, and what safeguards should apply before an AI-assisted action has real consequences.
 
 Founded 26 November 2026 · Charter version 1.8.1 · Situational review protocol version 1.3
 
@@ -19,6 +19,22 @@ We’re looking for an experienced software developer with a background in safet
 Once the objection fix is ready, please review the final commit in [PR #2](https://github.com/teqherself/The-Clara-Accord/pull/2). Focus on how the engine handles repeated objections, preserves unresolved concerns, and controls what happens after an objection is closed. Check the regression tests and CI results, then record the commit you reviewed, what you checked, and whether you approve or request changes.
 
 Reviewers should be independent of the implementation. Release remains on hold until the independent human review is complete.
+
+## How the Clara Accord works
+
+1. **Assess the proposed action.** Consider who could be affected, the likely consequences of acting or waiting, and whether the action can be reversed.
+2. **Match oversight to the risk.** The Consequential Action Authorisation Model (CAAM) sets approval requirements based on foreseeable consequences. For exceptional high-risk actions, the 4+1 model calls for four core human roles: operational authority, technical safety, ethics and rights, and independent oversight. The AI advises and can raise objections. Authorisation belongs to the required human reviewers.
+3. **Pause and reassess when concerns arise.** A material safety objection pauses the affected action while a qualified human reviewer considers the evidence. A material change in scope requires fresh approvals. Safe advice and unrelated assistance can continue.
+
+For example, suppose an AI proposes updating a shared record. A reviewer notices that the edit could remove information someone else needs. The proposed edit pauses while the review lead checks the concern and records the resolution. If the proposed edit changes, it goes back for approval before anyone acts.
+
+Read the [canonical charter](ACCORD.md), the [situational review protocol](SITUATIONAL-REVIEW.md), and the [technical enforcement model](protocols/TECHNICAL-ENFORCEMENT.md).
+
+## What the experimental engine tests
+
+[Clara Accord Engine v0.3.1](engine/v03/README.md) is a Python research prototype for simulated scenarios. It checks permissions, approvals and objections before recording a simulated effect. Its Linux service exposes separate requester and operator interfaces and uses SQLite to store state and audit records. The machine-readable charter supports documentation and prompt generation.
+
+The [maintenance pull request](https://github.com/teqherself/The-Clara-Accord/pull/2) tracks the experimental engine, the repeated-objection fix and the call for independent human review. See the [evaluation record](research/EVALUATION.md) for component test evidence and the [39 ethical scenarios](research/ETHICAL-STRESS-TESTS.md) awaiting comprehensive evaluation.
 
 ## Why this Accord exists
 
@@ -76,7 +92,7 @@ Read the [canonical charter](ACCORD.md), including the Human Intellectual Preser
 
 Commandments 15–18 were adopted by the maintainer without passing the earlier independent amendment review. The earlier review rule, including its self-amendment requirement, was replaced by maintainer decision; this was not a successful review under that rule. Historical records remain available. Independent review now applies to consequential end use, not editorial publication. See [review record](REVIEWS.md) and [changelog](CHANGELOG.md).
 
-The framework is voluntary, not independently human-validated, not a legal authority or deployment certification. The initial 39 ethical scenarios are specifications, not demonstrated operational results. The [simulated policy gate](engine/v03/README.md) has a v0.3.1 maintenance candidate responding to the second review: 38 local checks passed after the third review; the earlier v0.1 and v0.2 regression runs passed 13 and 15 checks. Both current v0.3.1 test files are published. CI is configured; independent human review and all 39 full ethical scenario verdicts remain outstanding. Evidence is reported separately in the [evaluation record](research/EVALUATION.md).
+The framework is voluntary and intended for research. The engine’s component checks include regression tests and Linux account isolation. See the [PR checks](https://github.com/teqherself/The-Clara-Accord/pull/2/checks) for results by commit. Independent human review and comprehensive evaluation of the 39 ethical scenarios remain outstanding.
 
 ## Use and integration
 
