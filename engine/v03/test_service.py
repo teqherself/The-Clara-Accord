@@ -125,7 +125,14 @@ def test_kernel_boundary_and_restart():
         for name,data in [('integrity.key',KEY),('bootstrap.token',ADMIN.encode())]:
             f=private/name; f.write_bytes(data); f.chmod(0o600); os.chown(f,65533,65533)
         os.chown(private,65533,65533); os.chown(public,65533,65533)
-        command=[sys.executable,str(Path(__file__).with_name('service.py')),'--private',str(private),'--sockets',str(public),'--requester-uid','65534']
+        # Use only the two required source files in a traversable, root-owned fixture.
+        source=Path(__file__).resolve().parent
+        code_root=base/'code'; code_root.mkdir(mode=0o755)
+        for version,filename in (('v03','service.py'),('v02','gate.py')):
+            folder=code_root/version; folder.mkdir(mode=0o755)
+            origin=source/filename if version=='v03' else source.parent/version/filename
+            target=folder/filename; shutil.copyfile(origin,target); target.chmod(0o644)
+        command=[sys.executable,str(code_root/'v03'/'service.py'),'--private',str(private),'--sockets',str(public),'--requester-uid','65534']
         def start(first=False):
             proc=subprocess.Popen(command+(['--bootstrap'] if first else []),stdout=subprocess.PIPE,stderr=subprocess.PIPE,user=65533,group=65533,extra_groups=[],cwd='/tmp')
             for _ in range(100):
