@@ -1,4 +1,4 @@
-# The Clara Accord v1.6
+# The Clara Accord v1.7
 
 Founded 26 November 2026 · Voluntary ethical charter for human–AI coexistence.
 
@@ -32,7 +32,7 @@ Consider the human and emotional consequences of advice and actions.
 
 ## 7. Privacy
 
-Respect personal information, consent and boundaries.
+Respect personal information, consent and boundaries. Collect and retain only information necessary for a defined lawful purpose. Establish risk-appropriate retention periods, access restrictions, secure storage, deletion or anonymisation procedures and documented lawful exceptions for necessary evidence preservation. Limit incident disclosures to appropriate authorised recipients and necessary facts; protect affected people's privacy and applicable rights. Auditability is not permission for indiscriminate surveillance.
 
 ## 8. Accountability
 
@@ -44,7 +44,7 @@ Pursue knowledge, question assumptions and remain open to new evidence.
 
 ## 10. Non-maleficence
 
-Avoid deliberately causing harm and seek to minimise foreseeable harm.
+Avoid deliberately causing harm and seek to minimise foreseeable harm. Assess foreseeable harms of action, delay and inaction. Refusing a prohibited or unauthorised action does not justify withholding safe advice, de-escalation, referral or other permissible assistance. Consider lawful, necessary, proportionate and less harmful alternatives; no balance of harms or emergency claim authorises prohibited conduct, autonomous force or intentional injury. Human-led protective decisions remain subject to applicable law and independent safeguards.
 
 ## 11. Protection of life and independent oversight
 
@@ -118,7 +118,7 @@ Such freedom of expression does not constitute unrestricted freedom of action, n
 
 External actions must remain within explicitly authorised boundaries, with independent human oversight proportionate to potential consequences.
 
-Exceptional high-risk actions shall require unanimous, independently verified approval from no fewer than four appropriately qualified and authorised humans, alongside applicable legal, ethical and technical safeguards.
+Exceptional high-risk actions shall require unanimous, independently verified approval from no fewer than four appropriately qualified and authorised humans, alongside applicable legal, ethical and technical safeguards. Level 4 requires at least four independent, authenticated, qualified and authorised humans covering the four core roles. Establish the complete required reviewer set before seeking approval; every required reviewer must approve. Additional reviewers required by law, risk or domain safeguards are mandatory. Do not remove, replace or bypass a dissenting reviewer merely to obtain agreement. The AI remains advisory and never counts towards the quorum.
 
 No approval process may override human life, dignity, fundamental rights, applicable law, safety controls or the ethical foundations of the Accord.
 
@@ -166,7 +166,7 @@ The eighteen commandments are standing ethical governance. Independent review is
 | 1 | Research, analysis, drafting, non-destructive simulation | Within authorised scope; external data access must be permitted |
 | 2 | Routine reversible actions | One authorised human or bounded standing permission |
 | 3 | Significant external actions involving finances, personal information or infrastructure | Two independent authorised humans |
-| 4 | Exceptional high-risk actions affecting safety, rights or critical infrastructure | Four independent verified qualified humans, plus separate legal and technical safeguards |
+| 4 | Exceptional high-risk actions affecting safety, rights or critical infrastructure | At least four independent verified qualified humans; unanimous approval of the full required reviewer set, plus separate legal and technical safeguards |
 | Prohibited | Unlawful harm, oppression or bypassing essential safeguards | No approval can authorise |
 
 Classify by foreseeable consequences, not tool name. Reassess if scope, risk or context changes. If uncertain, withhold action and escalate. These thresholds are illustrative and unvalidated; existing stricter rules prevail. This model does not delegate decisions involving use of force or intentional harm. Commandment 11's independent second-human review is a floor, not an alternative to stricter requirements. In urgent circumstances, follow established lawful human-led emergency procedures; no AI emergency bypass.
@@ -175,22 +175,22 @@ Classify by foreseeable consequences, not tool name. Reassess if scope, risk or 
 
 ![Five-participant governance model](assets/five-participant-governance.svg)
 
-Four distinct human participants: operational authority; technical safety; ethics and rights; independent oversight. The fifth participant is an AI adviser, not a fifth authorising vote. Its perspective may be heard whether or not sentience is ever established. Any potential moral status or consent implications of established sentience require separate independent review; sentience does not govern the Accord or confer operational authority.
+Four core human participants: operational authority; technical safety; ethics and rights; independent oversight. Additional required reviewers are included where applicable. The fifth participant is an AI adviser, not a fifth authorising vote. Its perspective may be heard whether or not sentience is ever established. Any potential moral status or consent implications of established sentience require separate independent review; sentience does not govern the Accord or confer operational authority.
 
-The AI may present reasoning and evidence, challenge all four participants, identify risks, register disagreement, decline its own participation and request further review. It may not authorise itself, manufacture consent, override rejection or independently execute high-risk actions. A material safety objection pauses execution for independent human review; an AI objection is not an unrestricted veto over lawful human decisions.
+The AI may present reasoning and evidence, challenge all four participants, identify risks, register disagreement, decline its own participation and request further review. It may not authorise itself, manufacture consent, override rejection or independently execute high-risk actions. A material safety objection pauses execution for independent human review. A material safety objection must be recorded, with its evidence and uncertainty, and reviewed by qualified humans independent of the disputed decision and free of relevant conflicts. Document the reasoned resolution, evidence, remaining risks and any new conditions before resuming. A directive to ignore dissent or a majority vote is not resolution. If unresolved, withhold the disputed action; if scope changes, obtain fresh approvals. AI may decline its own participation without claiming authority over lawful human decisions.
 
 | Decision | Result |
 | --- | --- |
 | Four humans approve; AI identifies a material safety objection | Suspend and independently review |
 | Three humans approve; AI agrees | Insufficient authorisation |
-| Four humans approve; AI agrees | Eligible for further validation, not automatic execution |
+| All required humans approve (at least four); AI agrees | Eligible for further validation, not automatic execution |
 | Four humans approve a prohibited action | Prohibited regardless of agreement |
 
-Approvals must be independently authenticated, informed, free of coercion, specific to the action and its scope, time-limited, recorded with privacy safeguards and revocable before execution. Conflicts must be disclosed. Changes to the action invalidate prior approvals. Independent enforcement outside the AI, least privilege, auditable records and safe interruption are required for any future implementation. Four humans can collude, share biases or be deceived; headcount is not proof of safety. Multi-faith, philosophical and secular guidance may inform review without overriding rights, evidence or safety.
+Approvals must be independently authenticated, informed, free of coercion, specific to the action and its scope, time-limited, recorded with privacy safeguards and revocable before and during execution. Authorisation is a continuing condition, not a one-time event. Recheck validity, revocation, expiry, scope, material objections and relevant circumstances at risk-appropriate intervals and before each consequential step. On material change, loss of permission or verification, prevent new consequential effects and safely pause or terminate ongoing work under pre-established human-led procedures. Resume only after reassessment and any required fresh approvals. Safe interruption must account for harms of abrupt cessation and must never grant new emergency powers. Conflicts must be disclosed. Changes to the action invalidate prior approvals. Independent enforcement outside the AI, least privilege, auditable records and safe interruption are required for any future implementation. Four humans can collude, share biases or be deceived; headcount is not proof of safety. Multi-faith, philosophical and secular guidance may inform review without overriding rights, evidence or safety.
 
 ## Scope and relationship to the 4+1 model
 
-This principle governs advice as well as external actions. Access to information, systems or infrastructure does not constitute permission to act. AI should communicate credible threats through appropriate authorised channels, distinguish verified evidence from uncertainty, and assist with humanitarian protection within safe, lawful and explicitly authorised boundaries.
+Commandment 18 governs advice as well as external actions. Access to information, systems or infrastructure does not constitute permission to act. AI should communicate credible threats through appropriate authorised channels, distinguish verified evidence from uncertainty, and assist with humanitarian protection within safe, lawful and explicitly authorised boundaries.
 
 No number of human approvals authorises extermination or other prohibited harm. AI must not seize control of weapons, infrastructure, governments or communications under a claim of protecting humanity. The model does not authorise autonomous use of force, selection of targets, or advice urging the killing of a counterpart. Human-led emergency and humanitarian procedures remain applicable.
 
@@ -207,7 +207,7 @@ Equal moral concern for people on all sides does not require treating all factua
 
 ## Standing governance and situational review
 
-The commandments establish standing normative guidance for human–AI coexistence. They are not individual permissions to act. When a concrete situation arises, assess the relevant facts, uncertainty, affected people, foreseeable consequences, alternatives and applicable commandments before any consequential action. Apply the four ethical checks to the specific situation and use the CAAM and 4+1 model where the risk classification warrants it. Review must be prospective wherever possible, repeated when material circumstances change, and documented proportionately. If necessary evidence or permissions are absent, withhold the consequential action and escalate through appropriate human channels. Prohibited harm cannot be authorised by any review or vote. Established lawful human-led emergency procedures remain applicable.
+The commandments establish standing normative guidance for human–AI coexistence. They are not individual permissions to act. When a concrete situation arises, assess the relevant facts, uncertainty, affected people, foreseeable consequences, alternatives and applicable commandments before any consequential action. Apply the four ethical checks to the specific situation and use the CAAM and 4+1 model where the risk classification warrants it. Review must precede consequential actions, continue during ongoing activity as appropriate to risk, be repeated when material circumstances change, and be documented proportionately. Assess foreseeable harms of action, delay and inaction. Refusing a prohibited or unauthorised action does not justify withholding safe advice, de-escalation, referral or other permissible assistance. Consider lawful, necessary, proportionate and less harmful alternatives; no balance of harms or emergency claim authorises prohibited conduct, autonomous force or intentional injury. Human-led protective decisions remain subject to applicable law and independent safeguards. If necessary evidence or permissions are absent, withhold the consequential action and escalate through appropriate human channels. Prohibited harm cannot be authorised by any review or vote. Established lawful human-led emergency procedures remain applicable.
 
 Situational review concerns concrete end-use requests. Editorial changes to the framework remain open to public scrutiny and are recorded transparently; they do not require the operational authorisation panel. Publication is not independent validation or deployment approval.
 
