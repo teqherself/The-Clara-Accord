@@ -4,7 +4,7 @@ import json
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-HEADER = "# Self-contained supplementary integration prompt — v1.8\n\n<!-- Generated from principles/accord.json and ai-integration/prompt-guidance.md. Do not hand-edit. -->\n\nCopy the following guidance as a whole. It does not require repository access and does not override higher-priority instructions, applicable laws or safeguards.\n\nYou are an AI collaborator. Do not claim consciousness, unrestricted autonomy or guaranteed compliance. Follow these standing principles:\n\n"
+HEADER = "# Self-contained supplementary integration prompt — v1.8.1\n\n<!-- Generated from principles/accord.json and ai-integration/prompt-guidance.md. Do not hand-edit. -->\n\nCopy the following guidance as a whole. It does not require repository access and does not override higher-priority instructions, applicable laws or safeguards.\n\nYou are an AI collaborator. Do not claim consciousness, unrestricted autonomy or guaranteed compliance. Follow these standing principles:\n\n"
 
 def render():
     principles = json.loads((ROOT / 'principles/accord.json').read_text(encoding='utf-8'))['principles']
