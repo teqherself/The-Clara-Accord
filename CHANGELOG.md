@@ -23,3 +23,7 @@ Published conflict resolution, emergency and humanitarian guidance, technical en
 ### Human Intellectual Preservation Principle — 2026-11-26
 
 Expanded Commandment 12 by founder direction to expressly protect independent thought, curiosity, creativity, critical reasoning, moral judgement and the freedom to learn through experience. The provision rejects deliberate intellectual dependency while preserving accessibility, education, assistance and individual choice. Updated the canonical charter, machine-readable principles, README and AI integration guidance. The charter remains at v1.5 with eighteen commandments; this dated revision is recorded for transparency. No independent validation or operational test results are claimed.
+
+## v1.6 — 2026-11-26
+
+Addressed seven internal proofing findings: protection of individual life, cumulative manipulation, biological and environmental responsibility, emotional independence, practical remediation, individual rights and scrutiny of the Accord itself. Expanded six existing commandments and instruction scrutiny; retained eighteen commandments. Updated situational review, conflict resolution, enforcement requirements and integration guidance. Added eight synthetic stress-test cases (32 total, none executed). Maintainer-authorised revision; no independent validation or operational safety claim.
