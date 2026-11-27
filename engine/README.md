@@ -24,3 +24,5 @@ Limitations: synthetic identities, no real authentication, independent process b
 ## Maintenance candidate v0.3.1
 
 See [v0.3.1 corrections and reproducible tests](v03/README.md). The new candidate passed 35 checks; v0.1 and v0.2 regression suites passed 13 and 15. Version-specific pytest configuration prevents duplicate module discovery. Run the three suites in separate processes. No live execution or independent validation.
+
+The third-review v0.3.1 candidate passed 38 local checks; combined recovery and audit separation are documented in [the current service notes](v03/README.md). Charter v1.8.1; CI and independent review remain outstanding.
