@@ -1,3 +1,5 @@
+> **Historical record — superseded.** This is not current governance. The maintainer adopted Commandments 15–18 without passing the earlier independent amendment review and replaced that review rule without satisfying its self-amendment requirement. Original findings below are retained for transparency; no independent validation is implied. See [current charter](ACCORD.md).
+
 # Historical amendment review protocol
 
 Superseded for current governance by [SITUATIONAL-REVIEW.md](SITUATIONAL-REVIEW.md) in v1.5. The founder directed this editorial policy change without independent validation. The former protocol is preserved below as a historical record, not a current publication requirement.
