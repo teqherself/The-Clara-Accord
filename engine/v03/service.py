@@ -28,17 +28,19 @@ class Action(BaseAction):
         body=json.dumps(['1.8.1/0.3.1', self.kind, self.resource, self.value, self.nonce], separators=(',',':')).encode()
         return hashlib.sha256(body).hexdigest()
 
-TABLES = ('actors', 'plans', 'approvals', 'objections', 'effects', 'audit', 'disabled', 'escalations', 'resolutions', 'backups', 'reviewer_roles', 'junk_counts')
+TABLES = ('actors', 'plans', 'approvals', 'objections', 'effects', 'audit', 'disabled', 'escalations', 'resolutions', 'backups', 'reviewer_roles', 'junk_counts', 'request_events')
 LIMIT = 16384
 CORE_ROLES = ('operational_authority', 'technical_safety', 'ethics_rights', 'independent_oversight')
-OPERATIONS = ('execute','object','add_actor','register','approve','revoke','close','credential','alerts')
+OPERATIONS = ('execute','object','add_actor','register','approve','revoke','close','credential','alerts','inspect')
 
 class OutcomeUncertain(Denied):
     """Commit completed but checkpoint confirmation failed; do not retry."""
 
 class ProtectedGate(Gate):
     """Trusted service only. HMAC state seal and a separately stored checkpoint."""
-    denial_limit = 1000
+    # Budgets count attempts, not approvals. Control traffic has a separate socket.
+    global_rate, global_burst = 8.0, 16.0
+    account_rate, account_burst = 2.0, 4.0
     JUNK_KINDS = ('wrong_peer', 'malformed_request', 'malformed_control')
 
     def __init__(self, path, key, admin_token=None, clock=time.time, verify=True):
@@ -52,6 +54,11 @@ class ProtectedGate(Gate):
         self.junk_lock = threading.Lock()
         self.junk_pending = {kind: 0 for kind in self.JUNK_KINDS}
         self.junk_last_flush = None
+        self.event_pending = {}
+        self.rate_lock = threading.Lock()
+        self.rate_clock = time.monotonic
+        self.rate_buckets = {}
+        self.control_retention = None
         self.maintenance_ok = True
         self.raw_clock = clock
         def transaction_clock():
@@ -89,7 +96,7 @@ class ProtectedGate(Gate):
             if temp.exists(): temp.unlink()
 
     @contextmanager
-    def tx(self, recovery=None):
+    def tx(self, recovery=None, read_only=False):
         self.local.actor = None
         self.local.now = None
         lock=None
@@ -112,6 +119,7 @@ class ProtectedGate(Gate):
                 c.execute('CREATE TABLE backups(plan TEXT PRIMARY KEY, actor TEXT NOT NULL)')
                 c.execute('CREATE TABLE reviewer_roles(actor TEXT PRIMARY KEY, role TEXT NOT NULL)')
                 c.execute('CREATE TABLE junk_counts(kind TEXT PRIMARY KEY, count INTEGER NOT NULL)')
+                c.execute('CREATE TABLE request_events(kind TEXT NOT NULL, operation TEXT NOT NULL, actor TEXT NOT NULL, first_at REAL NOT NULL, last_at REAL NOT NULL, count INTEGER NOT NULL, PRIMARY KEY(kind,operation,actor))')
                 c.execute('CREATE TABLE integrity(id INTEGER PRIMARY KEY CHECK(id=1), at REAL, mac TEXT, previous TEXT)')
                 previous = ''
             else:
@@ -129,6 +137,8 @@ class ProtectedGate(Gate):
                 elif now < row[0]: raise Denied('clock rollback')
                 previous = anchor
             yield c
+            if read_only:
+                c.rollback(); return
             if self.bootstrap:
                 for column in ('actor', 'outcome', 'subject', 'plane'):
                     c.execute(f'ALTER TABLE audit ADD COLUMN {column} TEXT')
@@ -154,6 +164,9 @@ class ProtectedGate(Gate):
             raise Denied('account disabled')
         result = super().auth(c, actor, token, role)
         self.local.actor = actor
+        if getattr(self.local,'request_dispatch',False) and not self.take_budget(('account',actor),self.account_rate,self.account_burst):
+            self.local.rate_limited=True
+            raise Denied('request rate limited')
         return result
 
     def log(self, c, event, key, outcome='ok', actor=None, subject=None, plane=None):
@@ -271,34 +284,76 @@ class ProtectedGate(Gate):
             c.execute('DELETE FROM approvals WHERE plan=?',(row[0],))
             self.log(c,'closed_'+reason,row[0])
 
+    def take_budget(self, key, rate, burst):
+        """Monotonic token bucket. Account keys only follow successful authentication."""
+        with self.rate_lock:
+            now=self.rate_clock()
+            tokens,last=self.rate_buckets.get(key,(burst,now))
+            tokens=min(burst,tokens+max(0,now-last)*rate)
+            allowed=tokens>=1
+            self.rate_buckets[key]=(tokens-1 if allowed else tokens,now)
+            return allowed
+
     def count_junk(self, kind):
-        """Constant-space aggregate; no disk write or individual audit entry per junk request."""
+        """Constant-space aggregate; no disk write per junk request."""
         if kind not in self.JUNK_KINDS: raise ValueError('unknown counter')
         with self.junk_lock:
-            self.junk_pending[kind] = min(2**63-1, self.junk_pending[kind]+1)
+            self.junk_pending[kind]=min(2**63-1,self.junk_pending[kind]+1)
+
+    def count_event(self, kind, op, actor='unverified'):
+        # Closed vocabulary. Actor is either a successfully authenticated account
+        # or the shared unverified bucket. Never key by payload, token or claimed name.
+        if kind not in ('privileged_attempt','refused','rate_limited') or op not in OPERATIONS:
+            raise ValueError('unknown event')
+        now=float(self.raw_clock())
+        if not math.isfinite(now): raise Denied('invalid clock')
+        key=(kind,op,actor)
+        with self.junk_lock:
+            first,last,count=self.event_pending.get(key,(now,now,0))
+            self.event_pending[key]=(min(first,now),max(last,now),min(2**63-1,count+1))
 
     def flush_junk(self):
-        """At most one counter transaction per monotonic second; never evicts audit evidence."""
+        """Persist counters and grouped events together at most once per monotonic second."""
         with self.junk_lock:
-            now=time.monotonic()
+            now=self.rate_clock()
             if self.junk_last_flush is not None and now-self.junk_last_flush<1: return
             pending=self.junk_pending.copy()
-            if not any(pending.values()): return
+            events=self.event_pending.copy()
+            if not any(pending.values()) and not events: return
             self.junk_pending={kind:0 for kind in self.JUNK_KINDS}
+            self.event_pending={}
             self.junk_last_flush=now
         try:
             with self.tx() as c:
                 for kind,count in pending.items():
                     if count:
                         c.execute('INSERT INTO junk_counts VALUES (?,?) ON CONFLICT(kind) DO UPDATE SET count=min(9223372036854775807,count+excluded.count)',(kind,count))
+                for (kind,op,actor),(first,last,count) in events.items():
+                    c.execute('INSERT INTO request_events VALUES (?,?,?,?,?,?) ON CONFLICT(kind,operation,actor) DO UPDATE SET first_at=min(first_at,excluded.first_at),last_at=max(last_at,excluded.last_at),count=min(9223372036854775807,count+excluded.count)',(kind,op,actor,first,last,count))
         except OutcomeUncertain:
-            # Do not re-add possibly committed counts.
+            # Commit may have completed. Do not double count.
             raise
         except BaseException:
             with self.junk_lock:
                 for kind,count in pending.items():
                     self.junk_pending[kind]=min(2**63-1,self.junk_pending[kind]+count)
+                for key,(first,last,count) in events.items():
+                    f,l,n=self.event_pending.get(key,(first,last,0))
+                    self.event_pending[key]=(min(first,f),max(last,l),min(2**63-1,n+count))
             raise
+
+    def inspect(self, admin):
+        """Read-only verified snapshot, available only to the control plane administrator."""
+        with self.tx(read_only=True) as c:
+            self.auth(c,'admin',admin,'admin')
+            counters=dict(c.execute('SELECT kind,count FROM junk_counts'))
+            events=[dict(zip(('kind','operation','actor','first_at','last_at','count'),row))
+                    for row in c.execute('SELECT kind,operation,actor,first_at,last_at,count FROM request_events ORDER BY last_at DESC,kind,operation,actor LIMIT 100')]
+            total=c.execute('SELECT count(*) FROM request_events').fetchone()[0]
+        with self.junk_lock:
+            pending_junk=self.junk_pending.copy()
+            pending_events=sum(v[2] for v in self.event_pending.values())
+        return {'junk_counts':counters,'events':events,'event_groups':total,'pending_junk':pending_junk,'pending_events':pending_events}
 
     def maintenance(self, retention):
         """Record overdue escalations once. Remove aged audit events only; keep replay tombstones."""
@@ -309,7 +364,9 @@ class ProtectedGate(Gate):
             for oid,key in c.execute('SELECT id,plan FROM objections WHERE closed=0 AND deadline<=?',(now,)).fetchall():
                 if c.execute('INSERT OR IGNORE INTO escalations VALUES (?,?)',(oid,now)).rowcount:
                     self.log(c,'escalation_required',key)
-            removed=c.execute('DELETE FROM audit WHERE at<?',(now-retention,)).rowcount
+            control_retention=self.control_retention if self.control_retention is not None else retention
+            removed=c.execute("DELETE FROM audit WHERE (coalesce(plane,'control')='control' AND at<?) OR (plane='request' AND at<?)",(now-control_retention,now-retention)).rowcount
+            removed+=c.execute('DELETE FROM request_events WHERE last_at<?',(now-retention,)).rowcount
             if removed: self.log(c,'audit_retention_purge','')
             return removed
 
@@ -320,11 +377,19 @@ class ProtectedGate(Gate):
 
     def record_denial(self, request, authenticated=None, plane="request"):
         op=request.get('op'); args=request.get('args')
-        if not isinstance(args,dict): args={}
-        if not isinstance(op,str) or op not in OPERATIONS or not isinstance(request.get('args'),dict):
+        if not isinstance(op,str) or op not in OPERATIONS:
             self.count_junk('malformed_control' if plane=='control' else 'malformed_request'); return
-        if plane=='request' and op not in ('execute','object'):
-            self.count_junk('malformed_request'); return
+        if plane=='request':
+            # Privileged operation attempts are recognised before routing, regardless
+            # of argument shape. Identity is not verified on a forbidden operation.
+            if op not in ('execute','object'):
+                self.count_event('privileged_attempt',op); return
+            if not isinstance(args,dict):
+                self.count_junk('malformed_request'); return
+            self.count_event('rate_limited' if getattr(self.local,'rate_limited',False) else 'refused',op,authenticated or 'unverified')
+            return
+        if not isinstance(args,dict):
+            self.count_junk('malformed_control'); return
         claimed='admin' if 'admin' in args else args.get('actor')
         key=''
         obj=args.get('a')
@@ -333,24 +398,36 @@ class ProtectedGate(Gate):
         try:
             with self.tx() as c:
                 known=isinstance(claimed,str) and c.execute('SELECT 1 FROM actors WHERE id=?',(claimed,)).fetchone()
-                self.log(c,op,key,'denied',authenticated or 'unauthenticated',claimed if known and claimed!=authenticated else None,plane=plane)
-                # Unauthenticated requester refusals have their own bounded partition.
-                # Authenticated and control-plane evidence follows time retention only.
-                c.execute("DELETE FROM audit WHERE outcome='denied' AND plane='request' AND actor='unauthenticated' AND seq NOT IN (SELECT seq FROM audit WHERE outcome='denied' AND plane='request' AND actor='unauthenticated' ORDER BY seq DESC LIMIT ?)",(self.denial_limit,))
+                self.log(c,op,key,'denied',authenticated or 'unauthenticated',claimed if known and claimed!=authenticated else None,plane='control')
         except Denied: pass
 
     def dispatch(self, plane, request):
         self.local.actor=None
-        try: return self.route(plane,request)
+        self.local.rate_limited=False
+        self.local.request_dispatch=plane=='request'
+        try:
+            if plane=='request':
+                op=request.get('op')
+                if isinstance(op,str) and op in OPERATIONS and op not in ('execute','object'):
+                    raise Denied('operation forbidden')
+                if not isinstance(op,str) or op not in ('execute','object'):
+                    raise Denied('invalid operation')
+                if not self.take_budget(('global',),self.global_rate,self.global_burst):
+                    self.local.rate_limited=True
+                    raise Denied('request rate limited')
+            return self.route(plane,request)
         except OutcomeUncertain: raise
         except (Denied,ValueError,TypeError,KeyError,AttributeError):
             self.record_denial(request,getattr(self.local,'actor',None),plane)
             raise
+        finally:
+            self.local.request_dispatch=False
+            self.local.rate_limited=False
 
     def route(self, plane, request):
         op=request.get('op'); args=request.get('args',{})
         if not isinstance(args,dict): raise Denied('invalid arguments')
-        allowed={'request':{'execute':self.execute,'object':self.object},'control':{'add_actor':self.add_actor,'register':self.register,'approve':self.approve,'revoke':self.revoke,'object':self.object,'close':self.close_with_evidence,'credential':self.credential,'alerts':self.alerts}}
+        allowed={'request':{'execute':self.execute,'object':self.object},'control':{'add_actor':self.add_actor,'register':self.register,'approve':self.approve,'revoke':self.revoke,'object':self.object,'close':self.close_with_evidence,'credential':self.credential,'alerts':self.alerts,'inspect':self.inspect}}
         method=allowed[plane].get(op)
         if not method or 'requester_only' in args: raise Denied('operation forbidden')
         if op=='object' and plane=='request': args=dict(args,requester_only=True)
@@ -418,7 +495,7 @@ def maintenance_step(gate, retention):
 def serve(args):
     os.umask(0o077)
     private=Path(args.private); public=Path(args.sockets)
-    if not 60<=args.retention<=31536000: raise Denied('invalid retention')
+    if not 60<=args.retention<=31536000 or not 60<=args.control_retention<=31536000: raise Denied('invalid retention')
     protected_directory(private,0o700); protected_directory(public,0o755)
     lock=os.open(private/'service.lock',os.O_CREAT|os.O_RDWR|os.O_NOFOLLOW,0o600)
     fcntl.flock(lock,fcntl.LOCK_EX|fcntl.LOCK_NB)
@@ -442,6 +519,7 @@ def serve(args):
         return
     bootstrap=read_secret(private/'bootstrap.token').decode().strip() if args.bootstrap else None
     gate=ProtectedGate(str(private/'gate.db'),key,bootstrap)
+    gate.control_retention=args.control_retention
     if args.bootstrap: (private/'bootstrap.token').unlink()
     for name in ('request.sock','control.sock'):
         path=public/name
@@ -457,7 +535,7 @@ def serve(args):
         time.sleep(1)
 
 def main():
-    p=argparse.ArgumentParser(); p.add_argument('--private',required=True); p.add_argument('--sockets',required=True); p.add_argument('--requester-uid',required=True,type=int); p.add_argument('--retention',type=int,default=86400); p.add_argument('--bootstrap',action='store_true'); p.add_argument('--recover',choices=('clock','checkpoint','combined'))
+    p=argparse.ArgumentParser(); p.add_argument('--private',required=True); p.add_argument('--sockets',required=True); p.add_argument('--requester-uid',required=True,type=int); p.add_argument('--retention',type=int,default=86400); p.add_argument('--control-retention',type=int,default=86400); p.add_argument('--bootstrap',action='store_true'); p.add_argument('--recover',choices=('clock','checkpoint','combined'))
     serve(p.parse_args())
 
 if __name__=='__main__': main()
