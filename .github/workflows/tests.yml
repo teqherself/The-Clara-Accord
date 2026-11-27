@@ -19,3 +19,15 @@ jobs:
         working-directory: engine/v02
       - run: python -m pytest -q -rs
         working-directory: engine/v03
+  linux-isolation:
+    # Disposable GitHub-hosted runner. Only the test harness runs as root.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - run: python -m pip install pytest==9.0.2
+      - name: Run separate-UID isolation test
+        run: sudo -- "$(command -v python)" -m pytest -q -rs test_service.py -k kernel_boundary_and_restart
+        working-directory: engine/v03
