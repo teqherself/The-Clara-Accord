@@ -12,6 +12,14 @@ Founded 26 November 2026 · Charter version 1.8.1 · Situational review protocol
 
 > Life is the foundation. Technology is the instrument. Knowledge is something we continually discover.
 
+## Independent human reviewer wanted
+
+We’re looking for an experienced software developer with a background in safety, security, or responsible technology to review Clara Accord Engine v0.3.1, an experimental prototype for simulated scenarios.
+
+Once the objection fix is ready, please review the final commit in [PR #2](https://github.com/teqherself/The-Clara-Accord/pull/2). Focus on how the engine handles repeated objections, preserves unresolved concerns, and controls what happens after an objection is closed. Check the regression tests and CI results, then record the commit you reviewed, what you checked, and whether you approve or request changes.
+
+Reviewers should be independent of the implementation. Release remains on hold until the independent human review is complete.
+
 ## Why this Accord exists
 
 The Clara Accord began with a question: how can humans and artificial intelligence work together without surrendering the qualities that make independent human life valuable?
