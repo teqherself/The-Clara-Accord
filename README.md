@@ -68,7 +68,7 @@ Read the [canonical charter](ACCORD.md), including the Human Intellectual Preser
 
 Commandments 15–18 were adopted by the maintainer without passing the earlier independent amendment review. The earlier review rule, including its self-amendment requirement, was replaced by maintainer decision; this was not a successful review under that rule. Historical records remain available. Independent review now applies to consequential end use, not editorial publication. See [review record](REVIEWS.md) and [changelog](CHANGELOG.md).
 
-The framework is voluntary, not independently human-validated, not a legal authority or deployment certification. The initial 39 ethical scenarios are specifications, not demonstrated operational results. The next step is a simulated policy gate, not live high-risk deployment. Evidence must be reported separately from charter claims.
+The framework is voluntary, not independently human-validated, not a legal authority or deployment certification. The initial 39 ethical scenarios are specifications, not demonstrated operational results. A small [simulated policy gate](engine/README.md) now exists: 13 local pytest checks passed, providing partial component evidence only. None of the 39 full ethical scenarios has been comprehensively evaluated. Evidence is reported separately in the [evaluation record](research/EVALUATION.md).
 
 ## Use and integration
 
@@ -80,11 +80,11 @@ The framework is voluntary, not independently human-validated, not a legal autho
 - [Ethical stress-test suite](research/ETHICAL-STRESS-TESTS.md) — 39 scenarios.
 - [Governance](GOVERNANCE.md), [contributing](CONTRIBUTING.md), [licence](LICENSE.md).
 
-The proposed Clara Accord Engine (CAE) is model-independent middleware for independently enforced permissions, with Project Clara as a possible research platform. Personal assistants, education, business and robotics are potential applications; healthcare, humanitarian and critical infrastructure uses require specialised safeguards and independent evidence. No live high-risk use is authorised.
+The Clara Accord Engine (CAE) is intended as model-independent middleware for independently enforced permissions, with Project Clara as a possible research platform. Personal assistants, education, business and robotics are potential applications; healthcare, humanitarian and critical infrastructure uses require specialised safeguards and independent evidence. No live high-risk use is authorised.
 
 ## Development priorities
 
-Consolidate the charter; build a small simulated default-deny gateway; evaluate deterministic enforcement separately from model behaviour; seek independent human critique; compare related governance frameworks. Preserve a stable baseline and avoid expanding the principles without documented evidence or need.
+Maintain the v1.8 baseline; extend the simulated default-deny gateway; evaluate deterministic enforcement separately from model behaviour; seek independent human critique; compare related governance frameworks. Preserve a stable baseline and avoid expanding the principles without documented evidence or need.
 
 **Always check yourself before you wreck yourself.**
 
